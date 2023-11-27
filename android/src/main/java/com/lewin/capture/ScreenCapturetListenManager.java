@@ -118,12 +118,12 @@ public class ScreenCapturetListenManager {
         // 注册内容观察者
         mContext.getContentResolver().registerContentObserver(
                 MediaStore.Images.Media.INTERNAL_CONTENT_URI,
-                false,
+                true,
                 mInternalObserver
         );
         mContext.getContentResolver().registerContentObserver(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                false,
+                true,
                 mExternalObserver
         );
     }
@@ -164,12 +164,13 @@ public class ScreenCapturetListenManager {
         Cursor cursor = null;
         try {
             // 数据改变时查询数据库中最后加入的一条数据
+              contentUri = contentUri.buildUpon().appendQueryParameter("limit", "1").build();
             cursor = mContext.getContentResolver().query(
                     contentUri,
                     Build.VERSION.SDK_INT < 16 ? MEDIA_PROJECTIONS : MEDIA_PROJECTIONS_API_16,
                     null,
                     null,
-                    MediaStore.Images.ImageColumns.DATE_ADDED + " desc limit 1"
+                    MediaStore.Images.ImageColumns.DATE_ADDED + " desc"
             );
 
             if (cursor == null) {
