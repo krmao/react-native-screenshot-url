@@ -1,10 +1,9 @@
 {
   "name": "react-native-screenshot-url",
-  "version": "1.0.2",
-  "description": "获取系统截屏事件与获取当前屏幕截屏",
+  "version": "1.0.3",
+  "description": "detect system screenshot events and get the image uri by react native",
   "main": "index.js",
   "scripts": {
-    "test": "react native 获取系统截屏事件与获取当前屏幕截屏",
     "prepare": "rm -rf android/build node_modules"
   },
   "repository": {
@@ -20,13 +19,13 @@
     "capture",
     "screencapture"
   ],
-  "author": "Lewin",
-  "license": "ISC",
+  "author": "krmao",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/krmao/react-native-screenshot-url/issues"
   },
   "peerDependencies": {
-    "react-native": ">0.60.0"
+    "react-native": ">0.72.0"
   },
   "homepage": "https://github.com/krmao/react-native-screenshot-url#readme"
 }
