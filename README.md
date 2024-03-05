@@ -1,5 +1,14 @@
 # react-native-screenshot-url
 
+[![npm version](https://badge.fury.io/js/react-native-screenshot-url.svg)](https://badge.fury.io/js/react-native-screenshot-url)
+
+## Install
+
+```shell
+yarn add react-native-screenshot-url
+```
+
+## Usage
 ```typescript
 import ScreenShotUtil, { CallbackInfo } from 'react-native-screenshot-url';
 
@@ -15,3 +24,14 @@ useEffect(() => {
     };
 });
 ```
+
+## Features
+
+- support 22 - 32 permissions about images and videos
+- support Android API level 33 permissions about images and videos
+- startListener without permission
+- permission request is built-in before callback
+
+## Reference
+
+- https://github.com/bigzx/react-native-screen-capture
