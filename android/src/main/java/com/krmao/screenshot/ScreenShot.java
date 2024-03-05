@@ -1,21 +1,27 @@
 package com.krmao.screenshot;
 
 
+import static android.os.Build.VERSION.SDK_INT;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.os.Build;
+import android.net.Uri;
 import android.os.Environment;
 import android.util.Base64;
+import android.util.Log;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
+import com.facebook.react.ReactActivity;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -29,13 +35,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
-@SuppressWarnings({"ConstantConditions", "ToArrayCallWithZeroLengthArrayArgument", "unused", "JavadocDeclaration", "ResultOfMethodCallIgnored", "ForLoopReplaceableByForEach"})
+@SuppressWarnings({"ConstantConditions", "ToArrayCallWithZeroLengthArrayArgument", "unused", "JavadocDeclaration", "ResultOfMethodCallIgnored", "ForLoopReplaceableByForEach", "Convert2Lambda"})
 public class ScreenShot extends ReactContextBaseJavaModule {
 
     private final ReactApplicationContext reactContext;
@@ -56,7 +61,7 @@ public class ScreenShot extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void startListener(String keywords,Promise promise) {
+    public void startListener(String keywords, Promise promise) {
         String[] keys = null;
         if (keywords != null && keywords.length() > 0) {
             keys = keywords.split(",");
@@ -66,7 +71,7 @@ public class ScreenShot extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void stopListener(final Promise promise) {
-        try{
+        try {
             getCurrentActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -78,7 +83,7 @@ public class ScreenShot extends ReactContextBaseJavaModule {
                 }
             });
             promise.resolve("true");
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             promise.reject("500", ex.getMessage());
         }
@@ -87,35 +92,36 @@ public class ScreenShot extends ReactContextBaseJavaModule {
     @ReactMethod
     public void screenCapture(Boolean isHiddenStatus, String extension, Integer quality, Double scale, final Promise promise) {
         shotActivity(
-            getCurrentActivity(),
-            isHiddenStatus,
-            extension,
-            quality,
-            scale,
-            new ResultCallback() {
-                @Override
-                public void invoke(WritableMap result) {
-                    promise.resolve(result);
+                getCurrentActivity(),
+                isHiddenStatus,
+                extension,
+                quality,
+                scale,
+                new ResultCallback() {
+                    @Override
+                    public void invoke(WritableMap result) {
+                        promise.resolve(result);
+                    }
                 }
-            }
         );
     }
 
     @ReactMethod
     public void clearCache(Promise promise) {
         WritableMap map = Arguments.createMap();
-        try{
+        try {
             File file = new File(Environment.getExternalStorageDirectory() + path);
             deleteFile(file);
             map.putString("code", "200");
             promise.resolve(map);
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             promise.reject("500", ex.getMessage());
         }
 
 
     }
+
     private void deleteFile(File file) {
         if (file.isDirectory()) {
             File[] files = file.listFiles();
@@ -129,10 +135,33 @@ public class ScreenShot extends ReactContextBaseJavaModule {
         }
     }
 
+    private boolean hasPermissions(Activity activity, String[] permissions) {
+        if (permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
+                    Log.d("PERMISSIONS", "Permission is not granted: " + permission);
+                    return false;
+                }
+                Log.d("PERMISSIONS", "Permission already granted: " + permission);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private void doCallback(String imagePath) {
+        // 获取到系统文件
+        WritableMap map = Arguments.createMap();
+        map.putString("code", "200");
+        map.putString("uri", imagePath.indexOf("file://") == 0 ? imagePath : "file://" + imagePath);
+        map.putString("base64", bitmapToBase64(BitmapFactory.decodeFile(imagePath), "png", 100));
+        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("ScreenShot", map);
+    }
 
     private void startListenerCapture(final Promise promise, final String[] keywords) {
-        try{
-            getCurrentActivity().runOnUiThread(new Runnable() {
+        try {
+            ReactActivity currentActivity = (ReactActivity) getCurrentActivity();
+            currentActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     //此时已在主线程中，可以更新UI了
@@ -140,13 +169,38 @@ public class ScreenShot extends ReactContextBaseJavaModule {
                     manager = ScreenShotListenManager.newInstance(reactContext, keywords);
                     manager.setListener(
                             new ScreenShotListenManager.OnScreenShotListen() {
-                                public void onShot(String imagePath) {
-                                    // 获取到系统文件
-                                    WritableMap map = Arguments.createMap();
-                                    map.putString("code", "200");
-                                    map.putString("uri", imagePath.indexOf("file://") == 0 ? imagePath : "file://" + imagePath);
-                                    map.putString("base64", bitmapToBase64(BitmapFactory.decodeFile(imagePath), "png", 100));
-                                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("ScreenShot", map);
+                                public void onShot(Uri contentUri) {
+                                    manager.handleMediaContentChange(contentUri, new ScreenShotListenManager.OnScreenShotFinalListener() {
+                                        @Override
+                                        public void onShot(String imagePath) {
+                                            @SuppressWarnings({"Convert2Lambda", "Convert2Diamond"}) ActivityResultLauncher<String[]> multiplePermissionsContract = currentActivity.registerForActivityResult(
+                                                    new ActivityResultContracts.RequestMultiplePermissions(),
+                                                    new ActivityResultCallback<Map<String, Boolean>>() {
+                                                        @Override
+                                                        public void onActivityResult(Map<String, Boolean> result) {
+                                                            if (!result.containsValue(false)) {
+                                                                doCallback(imagePath);
+                                                            }
+                                                        }
+                                                    }
+                                            );
+                                            if (SDK_INT > 22) {
+                                                String[] PERMISSIONS;
+                                                if (SDK_INT > 32) {
+                                                    PERMISSIONS = new String[]{Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO,};
+                                                } else {
+                                                    PERMISSIONS = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
+                                                }
+                                                if (!hasPermissions(currentActivity, PERMISSIONS)) {
+                                                    multiplePermissionsContract.launch(PERMISSIONS);
+                                                } else {
+                                                    doCallback(imagePath);
+                                                }
+                                            } else {
+                                                doCallback(imagePath);
+                                            }
+                                        }
+                                    });
                                 }
                             }
                     );
@@ -154,7 +208,7 @@ public class ScreenShot extends ReactContextBaseJavaModule {
                     promise.resolve("success");
                 }
             });
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             promise.reject("500", ex.getMessage());
         }
@@ -165,11 +219,11 @@ public class ScreenShot extends ReactContextBaseJavaModule {
     /**
      * 根据指定的Activity截图（带空白的状态栏）
      *
-     * @param context 要截图的Activity
+     * @param context        要截图的Activity
      * @param isHiddenStatus
-     * @param extension output extension
-     * @param quality output quality
-     * @param scale scale output size
+     * @param extension      output extension
+     * @param quality        output quality
+     * @param scale          scale output size
      * @param callback
      * @return
      */
@@ -214,11 +268,11 @@ public class ScreenShot extends ReactContextBaseJavaModule {
         SimpleDateFormat simpleDate = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());
         String fileName = Environment.getExternalStorageDirectory() + path + simpleDate.format(now.getTime()) + "." + extension;
         File fileDir = new File(Environment.getExternalStorageDirectory() + path);
-        if(!fileDir.exists()) {
+        if (!fileDir.exists()) {
             fileDir.mkdir();
         }
         File file = new File(fileName);
-        if(file.exists()) {
+        if (file.exists()) {
             file.delete();
         }
         file.createNewFile();
@@ -254,8 +308,10 @@ public class ScreenShot extends ReactContextBaseJavaModule {
     private static Bitmap.CompressFormat extToCompressFormat(String extension) {
         switch (extension) {
             case "jpg":
-            case "jpeg": return Bitmap.CompressFormat.JPEG;
-            default: return Bitmap.CompressFormat.PNG;
+            case "jpeg":
+                return Bitmap.CompressFormat.JPEG;
+            default:
+                return Bitmap.CompressFormat.PNG;
         }
     }
 

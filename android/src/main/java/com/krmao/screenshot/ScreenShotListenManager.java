@@ -1,5 +1,6 @@
 package com.krmao.screenshot;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.ContentObserver;
 import android.database.Cursor;
@@ -19,6 +20,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings({"ListRemoveInLoop", "JavaReflectionMemberAccess", "ConstantConditions", "deprecation"})
 public class ScreenShotListenManager {
 
     /**
@@ -54,7 +56,7 @@ public class ScreenShotListenManager {
      */
     private final List<String> sHasCallbackPaths = new ArrayList<String>();
 
-    private Context mContext;
+    private final Context mContext;
 
     private OnScreenShotListen mListener;
 
@@ -70,7 +72,7 @@ public class ScreenShotListenManager {
      */
     private MediaContentObserver mExternalObserver;
 
-    private String[] mFileKeyWords;
+    private final String[] mFileKeyWords;
 
     /**
      * 运行在 UI 线程的 Handler, 用于运行监听器回调
@@ -157,14 +159,21 @@ public class ScreenShotListenManager {
         sHasCallbackPaths.clear();
     }
 
+    private void handleMediaContentChangeWrap(Uri contentUri) {
+        if (mListener != null ) {
+            mListener.onShot(contentUri);
+        }
+    }
+
     /**
      * 处理媒体数据库的内容改变
      */
-    private void handleMediaContentChange(Uri contentUri) {
+    @SuppressLint("ObsoleteSdkInt")
+    public void handleMediaContentChange(Uri contentUri, OnScreenShotFinalListener listener) {
         Cursor cursor = null;
         try {
             // 数据改变时查询数据库中最后加入的一条数据
-              contentUri = contentUri.buildUpon().appendQueryParameter("limit", "1").build();
+            contentUri = contentUri.buildUpon().appendQueryParameter("limit", "1").build();
             cursor = mContext.getContentResolver().query(
                     contentUri,
                     Build.VERSION.SDK_INT < 16 ? MEDIA_PROJECTIONS : MEDIA_PROJECTIONS_API_16,
@@ -208,7 +217,17 @@ public class ScreenShotListenManager {
             }
 
             // 处理获取到的第一行数据
-            handleMediaRowData(data, dateTaken, width, height);
+            if (checkScreenShot(data, dateTaken, width, height)) {
+                Log.e("lewinScreen","ScreenShot: path = " + data + "; size = " + width + " * " + height
+                        + "; date = " + dateTaken);
+                if (listener != null && !checkCallback(data)) {
+                    listener.onShot(data);
+                }
+            } else {
+                // 如果在观察区间媒体数据库有数据改变，又不符合截屏规则，则输出到 log 待分析
+                Log.e("lewinScreen","Media content changed, but not screenshot: path = " + data
+                        + "; size = " + width + " * " + height + "; date = " + dateTaken);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -225,23 +244,6 @@ public class ScreenShotListenManager {
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(imagePath, options);
         return new Point(options.outWidth, options.outHeight);
-    }
-
-    /**
-     * 处理获取到的一行数据
-     */
-    private void handleMediaRowData(String data, long dateTaken, int width, int height) {
-        if (checkScreenShot(data, dateTaken, width, height)) {
-            Log.e("lewinScreen","ScreenShot: path = " + data + "; size = " + width + " * " + height
-                    + "; date = " + dateTaken);
-            if (mListener != null && !checkCallback(data)) {
-                mListener.onShot(data);
-            }
-        } else {
-            // 如果在观察区间媒体数据库有数据改变，又不符合截屏规则，则输出到 log 待分析
-            Log.e("lewinScreen","Media content changed, but not screenshot: path = " + data
-                    + "; size = " + width + " * " + height + "; date = " + dateTaken);
-        }
     }
 
     /**
@@ -313,6 +315,7 @@ public class ScreenShotListenManager {
     /**
      * 获取屏幕分辨率
      */
+    @SuppressLint("ObsoleteSdkInt")
     private Point getRealScreenSize() {
         Point screenSize = null;
         try {
@@ -348,6 +351,10 @@ public class ScreenShotListenManager {
     }
 
     public static interface OnScreenShotListen {
+        public void onShot(Uri contentUri);
+    }
+
+    public static interface OnScreenShotFinalListener {
         public void onShot(String imagePath);
     }
 
@@ -367,7 +374,7 @@ public class ScreenShotListenManager {
      */
     private class MediaContentObserver extends ContentObserver {
 
-        private Uri mContentUri;
+        private final Uri mContentUri;
 
         public MediaContentObserver(Uri contentUri, Handler handler) {
             super(handler);
@@ -377,7 +384,7 @@ public class ScreenShotListenManager {
         @Override
         public void onChange(boolean selfChange) {
             super.onChange(selfChange);
-            handleMediaContentChange(mContentUri);
+            handleMediaContentChangeWrap(mContentUri);
         }
     }
 

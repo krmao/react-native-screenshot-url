@@ -60,34 +60,34 @@ export default class ScreenShotUtil {
      * @param {*} callBack
      * @param keyWords
      */
-    static async startListener(callBack, keyWords) {
+    static async startListenerWithPermission(callBack, keyWords) {
         if (!(await ScreenShotUtil.checkPermissionsForScreenShot())) {
-            console.log("---- checkPermissionsForScreenShot false, start requestPermissionsForScreenShot")
+            console.log("---- startListenerWithPermission checkPermissionsForScreenShot false, start requestPermissionsForScreenShot")
             await ScreenShotUtil.requestPermissionsForScreenShot();
         }
         if (await ScreenShotUtil.checkPermissionsForScreenShot()) {
-            console.log("---- checkPermissionsForScreenShot true, start startListenerWithoutPermission")
-            return ScreenShotUtil.startListenerWithoutPermission(callBack, keyWords);
+            console.log("---- startListenerWithPermission checkPermissionsForScreenShot true, start startListener")
+            return ScreenShotUtil.startListener(callBack, keyWords);
         } else {
-            console.log("---- checkPermissionsForScreenShot false, startListener return with null")
+            console.log("---- startListenerWithPermission checkPermissionsForScreenShot false, startListener return with null")
             return Promise.resolve(null);
         }
     }
 
-    static startListenerWithoutPermission(callBack, keyWords) {
-        console.log("---- startListenerWithoutPermission")
+    static startListener(callBack, keyWords) {
+        console.log("---- startListener keyWords=", keyWords)
         const ScreenShot = NativeModules.ScreenShot;
         // 创建自定义事件接口
         screenShotEmitter && screenShotEmitter.removeAllListeners('ScreenShot')
         screenShotEmitter = Platform.OS === 'ios' ? new NativeEventEmitter(ScreenShot) : DeviceEventEmitter;
         screenShotEmitter.addListener('ScreenShot', (data) => {
-            console.log("---- startListenerWithoutPermission callBack data.uri=", (!!data? data.uri : 'null'))
+            console.log("---- startListener callBack data.uri=", (!!data? data.uri : 'null'))
             if (callBack) {
                 callBack(data)
             }
         })
         if (Platform.OS === 'android') {
-            console.log("---- startListenerWithoutPermission startListener")
+            console.log("---- startListener ScreenShot.startListener")
             ScreenShot.startListener(keyWords);
         } else {
             ScreenShot.startListener();
