@@ -1,13 +1,18 @@
-export type ScreenShotUtil = {
-    checkPermissionsForScreenShot: () => Promise<any>;
-    requestPermissionsForScreenShot: () => Promise<any>;
-    startListener: (callback: (result: any) => void, keyWords: string) => Promise<any>;
-    startListenerWithoutPermission: (callback: (result: any) => void, keyWords: string) => Promise<any>;
-    stopListener: () => Promise<any>;
-    clearCache: (callback: (result: any) => void) => Promise<any>;
-    screenShot: (callback: (result: any) => void, isHiddenStatus: any, config: {
-        extension: string,
-        quality: number,
-        scale: number
-    }) => Promise<any>;
+declare module 'react-native-screenshot-url' {
+
+    export default class ScreenShotUtil {
+        static checkPermissionsForScreenShot(): () => Promise<any>;
+
+        static requestPermissionsForScreenShot: () => Promise<any>;
+        static startListener: (callback: (result: any) => void, keyWords: string) => Promise<any>;
+        static startListenerWithoutPermission: (callback: (result: any) => void, keyWords: string) => Promise<any>;
+        static stopListener: () => Promise<any>;
+        static clearCache: (callback: (result: any) => void) => Promise<any>;
+        static screenShot: (callback: (result: any) => void, isHiddenStatus: any, config: {
+            extension: string,
+            quality: number,
+            scale: number
+        }) => Promise<any>;
+    }
+
 }
