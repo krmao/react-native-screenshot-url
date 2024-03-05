@@ -3,7 +3,7 @@
 module.exports = {
   dependency: {
     platforms: {
-      ios: { project: "react-native-screenshot-url.podspec" },
+      ios: {},
       android: { sourceDir: "android" },
     },
   },
