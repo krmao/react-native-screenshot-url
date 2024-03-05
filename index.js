@@ -21,7 +21,7 @@ export default class ScreenShotUtil {
         if (SDK_INT > 22) {
             if (SDK_INT > 32) {
                 console.log("---- checkPermissionsForScreenShot > 32")
-                return (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES)) && (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO));
+                return (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES));
             } else {
                 console.log("---- checkPermissionsForScreenShot > 22")
                 return await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE)
@@ -42,9 +42,7 @@ export default class ScreenShotUtil {
             console.log("---- requestPermissionsForScreenShot SDK_INT=", SDK_INT)
             if (SDK_INT > 32) {
                 console.log("---- requestPermissionsForScreenShot > 32")
-                return await PermissionsAndroid.requestMultiple([PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-                    PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO
-                ]);
+                return await PermissionsAndroid.requestMultiple([PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES]);
             } else {
                 console.log("---- requestPermissionsForScreenShot > 22")
                 return await PermissionsAndroid.requestMultiple([PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE]);

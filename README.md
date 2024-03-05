@@ -27,8 +27,8 @@ useEffect(() => {
 
 ## Features
 
-- support 22 - 32 permissions about images and videos
-- support Android API level 33 permissions about images and videos
+- support 22 - 32 permissions about images
+- support Android API level 33 permissions about images
 - startListener without permission
 - permission request is built-in before callback
 

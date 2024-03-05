@@ -180,7 +180,7 @@ public class ScreenShot extends ReactContextBaseJavaModule {
                                         String[] PERMISSIONS;
                                         if (SDK_INT > 32) {
                                             Log.d("ScreenShot", "doWrapCallback SDK_INT > 32");
-                                            PERMISSIONS = new String[]{Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO,};
+                                            PERMISSIONS = new String[]{Manifest.permission.READ_MEDIA_IMAGES};
                                         } else {
                                             Log.d("ScreenShot", "doWrapCallback SDK_INT <= 32");
                                             PERMISSIONS = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
