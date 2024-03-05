@@ -1,8 +1,3 @@
-//
-//  ScreenShot.m
-//  ScreenShot
-//
-
 #import "ScreenShot.h"
 #import <UIKit/UIKit.h>
 #import "UIView+ComOpenThreadOTScreenShotHelperStatusBarReference.h"
@@ -107,28 +102,6 @@ RCT_EXPORT_METHOD(clearCache:(RCTPromiseResolveBlock)success failure:(RCTRespons
 
 - (void)getScreenShot:(NSNotification *)notification{
     NSLog(@"捕捉截屏事件");
-
-//    CGSize imageSize = CGSizeZero;
-//     imageSize = [UIScreen mainScreen].bounds.size;
-
-//     UIGraphicsBeginImageContextWithOptions(imageSize, NO, 0);
-//     CGContextRef context = UIGraphicsGetCurrentContext();
-//     for (UIWindow *window in [[UIApplication sharedApplication] windows])
-//     {
-//         CGContextSaveGState(context);
-//         CGContextTranslateCTM(context, window.center.x, window.center.y);
-//         CGContextConcatCTM(context, window.transform);
-//         CGContextTranslateCTM(context, -window.bounds.size.width * window.layer.anchorPoint.x, -window.bounds.size.height * window.layer.anchorPoint.y);
-//                 if ([window respondsToSelector:@selector(drawViewHierarchyInRect:afterScreenUpdates:)])
-//         {
-//             [window drawViewHierarchyInRect:window.bounds afterScreenUpdates:YES];
-//         }
-//         else
-//         {
-//             [window.layer renderInContext:context];
-//         }
-//         CGContextRestoreGState(context);
-//     }
     [self sendEventWithName:@"ScreenShot" body:[self screenImage:NO extension:@"png" quality:[NSNumber numberWithInt:100] scale:[NSNumber numberWithFloat:0]]];
 }
 
@@ -153,8 +126,6 @@ RCT_EXPORT_METHOD(clearCache:(RCTPromiseResolveBlock)success failure:(RCTRespons
         }
         NSString *encodedImageStr = @"";
         @try{
-            // UIGraphicsEndImageContext();
-            //    UIImageWriteToSavedPhotosAlbum(image, self, nil, nil);
             float scaleValue = [scale floatValue] > 0.0f ? [scale floatValue] : 1.0f;
             UIImage *outputImage = [self scaleImage:image to:scaleValue];
             // 保存文件的名称
@@ -187,13 +158,9 @@ RCT_EXPORT_METHOD(clearCache:(RCTPromiseResolveBlock)success failure:(RCTRespons
 {
     CGSize size = CGSizeMake((image.size.width * scale), (image.size.height * scale));
     UIGraphicsBeginImageContext(size);
-
     [image drawInRect:CGRectMake(0, 0, size.width, size.height)];
-
     UIImage *outputImage = UIGraphicsGetImageFromCurrentImageContext();
-
     UIGraphicsEndImageContext();
-
     return outputImage;
 }
 
@@ -209,7 +176,6 @@ RCT_EXPORT_METHOD(clearCache:(RCTPromiseResolveBlock)success failure:(RCTRespons
         UIGraphicsBeginImageContext(imageSize);
 
     CGContextRef context = UIGraphicsGetCurrentContext();
-
 
     // -renderInContext: renders in the coordinate space of the layer,
     // so we must first apply the layer's geometry to the graphics context
@@ -231,9 +197,7 @@ RCT_EXPORT_METHOD(clearCache:(RCTPromiseResolveBlock)success failure:(RCTRespons
 
     // Retrieve the screenshot image
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-
     UIGraphicsEndImageContext();
-
     return image;
 }
 

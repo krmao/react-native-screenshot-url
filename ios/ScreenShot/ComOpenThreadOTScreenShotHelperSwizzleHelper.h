@@ -1,11 +1,3 @@
-//
-//  OTSwizzleHelper.h
-//  OTNotificationViewDemo
-//
-//  Created by openthread on 8/9/13.
-//
-//
-
 #import <Foundation/Foundation.h>
 
 @interface ComOpenThreadOTScreenShotHelperSwizzleHelper : NSObject

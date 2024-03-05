@@ -1,11 +1,3 @@
-//
-//  OTSwizzleHelper.m
-//  OTNotificationViewDemo
-//
-//  Created by openthread on 8/9/13.
-//
-//
-
 #import "ComOpenThreadOTScreenShotHelperSwizzleHelper.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
