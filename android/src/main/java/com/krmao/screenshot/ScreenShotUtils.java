@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-@SuppressWarnings({"JavadocDeclaration", "ConstantConditions", "unused"})
+@SuppressWarnings({"JavadocDeclaration", "ConstantConditions", "unused", "Convert2Lambda"})
 public class ScreenShotUtils {
     private ScreenShotUtils() {
         /* cannot be instantiated */
@@ -110,8 +110,7 @@ public class ScreenShotUtils {
             view.setDrawingCacheEnabled(true);
             view.buildDrawingCache();
             Bitmap bmp = view.getDrawingCache();
-            Bitmap bp = null;
-            bp = Bitmap.createBitmap(bmp, 0, 0, width, height);
+            Bitmap bp = Bitmap.createBitmap(bmp, 0, 0, width, height);
             view.destroyDrawingCache();
             callback.invoke(bp);
         }
@@ -133,18 +132,9 @@ public class ScreenShotUtils {
         int height = getScreenHeight(activity);
 
         if (Build.VERSION.SDK_INT >= 26) {
-            Rect rect = new Rect(
-                    0,
-                    statusBarHeight,
-                    width,
-                    height
-            );
+            Rect rect = new Rect(0, statusBarHeight, width, height);
             final Bitmap bitmap = Bitmap.createBitmap(width, height - statusBarHeight, Bitmap.Config.ARGB_8888);
-            PixelCopy.request(
-                    window,
-                    rect,
-                    bitmap,
-                    new PixelCopy.OnPixelCopyFinishedListener() {
+            PixelCopy.request(window, rect, bitmap, new PixelCopy.OnPixelCopyFinishedListener() {
                         @Override
                         public void onPixelCopyFinished(int copyResult) {
                             if (copyResult == PixelCopy.SUCCESS) {
@@ -160,8 +150,7 @@ public class ScreenShotUtils {
             view.setDrawingCacheEnabled(true);
             view.buildDrawingCache();
             Bitmap bmp = view.getDrawingCache();
-            Bitmap bp = null;
-            bp = Bitmap.createBitmap(bmp, 0, statusBarHeight, width, height
+            Bitmap bp = Bitmap.createBitmap(bmp, 0, statusBarHeight, width, height
                     - statusBarHeight);
             view.destroyDrawingCache();
             callback.invoke(bp);

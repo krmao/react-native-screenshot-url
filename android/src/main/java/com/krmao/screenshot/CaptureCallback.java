@@ -5,5 +5,5 @@ import android.graphics.Bitmap;
 import androidx.annotation.Nullable;
 
 public interface CaptureCallback {
-    public void invoke(@Nullable Bitmap data);
+    void invoke(@Nullable Bitmap data);
 }

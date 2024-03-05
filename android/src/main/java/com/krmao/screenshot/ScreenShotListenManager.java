@@ -54,7 +54,7 @@ public class ScreenShotListenManager {
     /**
      * 已回调过的路径
      */
-    private final List<String> sHasCallbackPaths = new ArrayList<String>();
+    private final List<String> sHasCallbackPaths = new ArrayList<>();
 
     private final Context mContext;
 
@@ -204,8 +204,8 @@ public class ScreenShotListenManager {
             // 获取行数据
             String data = cursor.getString(dataIndex);
             long dateTaken = cursor.getLong(dateTakenIndex);
-            int width = 0;
-            int height = 0;
+            int width;
+            int height;
             if (widthIndex >= 0 && heightIndex >= 0) {
                 width = cursor.getInt(widthIndex);
                 height = cursor.getInt(heightIndex);
@@ -348,12 +348,12 @@ public class ScreenShotListenManager {
         mListener = listener;
     }
 
-    public static interface OnScreenShotListen {
-        public void onShot(Uri contentUri);
+    public interface OnScreenShotListen {
+        void onShot(Uri contentUri);
     }
 
-    public static interface OnScreenShotFinalListener {
-        public void onShot(String imagePath);
+    public interface OnScreenShotFinalListener {
+        void onShot(String imagePath);
     }
 
     private static void assertInMainThread() {
