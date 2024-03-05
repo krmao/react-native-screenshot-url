@@ -66,21 +66,28 @@ public class ScreenCapture extends ReactContextBaseJavaModule {
 
         if (Build.VERSION.SDK_INT > 22) {
             List<String> permissionList = new ArrayList<>();
-            // 检查权限
-            if (ContextCompat.checkSelfPermission(reactContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            } else {
-
-                this.startListenerCapture(promise, keys);
+            if (Build.VERSION.SDK_INT > 32) {
+                if (ContextCompat.checkSelfPermission(reactContext, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+                    permissionList.add(Manifest.permission.READ_MEDIA_IMAGES);
+                } else if (ContextCompat.checkSelfPermission(reactContext, Manifest.permission.READ_MEDIA_VIDEO) != PackageManager.PERMISSION_GRANTED) {
+                    permissionList.add(Manifest.permission.READ_MEDIA_VIDEO);
+                } else {
+                    this.startListenerCapture(promise, keys);
+                }
+            }else{
+                if (ContextCompat.checkSelfPermission(reactContext, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    permissionList.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+                } else {
+                    this.startListenerCapture(promise, keys);
+                }
             }
+
             if (permissionList != null && (permissionList.size() != 0)) {
                 Activity activity = getCurrentActivity();
                 if (activity != null) {
                     ActivityCompat.requestPermissions(activity, permissionList.toArray(new String[permissionList.size()]), 0);
                 }
-
             }
-
         }else {
             this.startListenerCapture(promise, keys);
         }
@@ -225,11 +232,11 @@ public class ScreenCapture extends ReactContextBaseJavaModule {
 
     /**
      * save bitmap to file
-     * 
+     *
      * @param bitmap
      * @param extension
      * @param quality
-     * @return 
+     * @return
      */
     private static String saveFile(Bitmap bitmap, String extension, int quality) throws Exception {
         Calendar now = new GregorianCalendar();
@@ -253,7 +260,7 @@ public class ScreenCapture extends ReactContextBaseJavaModule {
 
     /**
      * Resize bitmap
-     * 
+     *
      * @param src
      * @param newWidth
      * @param newHeight
@@ -271,7 +278,7 @@ public class ScreenCapture extends ReactContextBaseJavaModule {
 
     /**
      * extension to CompressFormat
-     * 
+     *
      * @param extension
      * @return
      */

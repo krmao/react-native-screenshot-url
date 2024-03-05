@@ -1,15 +1,15 @@
 {
-  "name": "react-native-lewin-screen-capture",
-  "version": "1.1.0",
+  "name": "react-native-screenshot-url",
+  "version": "0.0.1",
   "description": "获取系统截屏事件与获取当前屏幕截屏",
   "main": "index.js",
   "scripts": {
     "test": "react native 获取系统截屏事件与获取当前屏幕截屏",
-    "prepare": "rm -rf android/build Example/android/build Example/android/app/build node_modules Example/ios/build"
+    "prepare": "rm -rf android/build node_modules"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/LewinJun/react-native-lewin-screen-capture.git"
+    "url": "git+https://github.com/krmao/react-native-screenshot-url.git"
   },
   "keywords": [
     "系统截屏事件",
@@ -23,10 +23,10 @@
   "author": "Lewin",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/LewinJun/react-native-lewin-screen-capture/issues"
+    "url": "https://github.com/krmao/react-native-screenshot-url/issues"
   },
   "peerDependencies": {
     "react-native": ">0.60.0"
   },
-  "homepage": "https://github.com/LewinJun/react-native-lewin-screen-capture#readme"
+  "homepage": "https://github.com/krmao/react-native-screenshot-url#readme"
 }
