@@ -14,14 +14,10 @@ import android.os.Environment;
 import android.util.Base64;
 import android.util.Log;
 
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
-import com.facebook.react.ReactActivity;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -29,18 +25,20 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.facebook.react.modules.core.PermissionAwareActivity;
+import com.facebook.react.modules.core.PermissionListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
-import java.util.Map;
 
-@SuppressWarnings({"ConstantConditions", "ToArrayCallWithZeroLengthArrayArgument", "unused", "JavadocDeclaration", "ResultOfMethodCallIgnored", "ForLoopReplaceableByForEach", "Convert2Lambda"})
+@SuppressWarnings({"ConstantConditions", "unused", "JavadocDeclaration", "ResultOfMethodCallIgnored", "ForLoopReplaceableByForEach", "Convert2Lambda"})
 public class ScreenShot extends ReactContextBaseJavaModule {
 
     private final ReactApplicationContext reactContext;
@@ -52,6 +50,7 @@ public class ScreenShot extends ReactContextBaseJavaModule {
     public ScreenShot(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
+
     }
 
     @NonNull
@@ -59,6 +58,8 @@ public class ScreenShot extends ReactContextBaseJavaModule {
     public String getName() {
         return "ScreenShot";
     }
+
+    private Uri mContentUri;
 
     @ReactMethod
     public void startListener(String keywords, Promise promise) {
@@ -149,7 +150,20 @@ public class ScreenShot extends ReactContextBaseJavaModule {
         return false;
     }
 
+    private void doWrapCallback(Uri contentUri) {
+        Log.d("ScreenShot", "doWrapCallback handleMediaContentChange contentUri=" + contentUri.toString());
+        manager.handleMediaContentChange(contentUri, new ScreenShotListenManager.OnScreenShotFinalListener() {
+            @Override
+            public void onShot(String imagePath) {
+                Log.d("ScreenShot", "doWrapCallback onShot imagePath=" + imagePath);
+                doCallback(imagePath);
+            }
+        });
+    }
+
     private void doCallback(String imagePath) {
+        Log.d("ScreenShot", "doCallback imagePath=" + imagePath);
+
         // 获取到系统文件
         WritableMap map = Arguments.createMap();
         map.putString("code", "200");
@@ -160,7 +174,7 @@ public class ScreenShot extends ReactContextBaseJavaModule {
 
     private void startListenerCapture(final Promise promise, final String[] keywords) {
         try {
-            ReactActivity currentActivity = (ReactActivity) getCurrentActivity();
+            Activity currentActivity = getCurrentActivity();
             currentActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -170,40 +184,64 @@ public class ScreenShot extends ReactContextBaseJavaModule {
                     manager.setListener(
                             new ScreenShotListenManager.OnScreenShotListen() {
                                 public void onShot(Uri contentUri) {
-                                    manager.handleMediaContentChange(contentUri, new ScreenShotListenManager.OnScreenShotFinalListener() {
-                                        @Override
-                                        public void onShot(String imagePath) {
-                                            @SuppressWarnings({"Convert2Lambda", "Convert2Diamond"}) ActivityResultLauncher<String[]> multiplePermissionsContract = currentActivity.registerForActivityResult(
-                                                    new ActivityResultContracts.RequestMultiplePermissions(),
-                                                    new ActivityResultCallback<Map<String, Boolean>>() {
-                                                        @Override
-                                                        public void onActivityResult(Map<String, Boolean> result) {
-                                                            if (!result.containsValue(false)) {
-                                                                doCallback(imagePath);
+                                    Log.d("ScreenShot", "setListener onShot contentUri=" + contentUri.toString());
+                                    if (SDK_INT > 22) {
+                                        String[] PERMISSIONS;
+                                        if (SDK_INT > 32) {
+                                            Log.d("ScreenShot", "doCallback SDK_INT > 32");
+                                            PERMISSIONS = new String[]{Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO,};
+                                        } else {
+                                            Log.d("ScreenShot", "doCallback SDK_INT <= 32");
+                                            PERMISSIONS = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
+                                        }
+                                        Log.d("ScreenShot", "check Permissions PERMISSIONS=" + Arrays.toString(PERMISSIONS));
+
+                                        if (!hasPermissions(currentActivity, PERMISSIONS)) {
+                                            Log.d("ScreenShot", "hasPermissions false, launch PERMISSIONS ui");
+                                            mContentUri = contentUri;
+                                            PermissionAwareActivity activity = getPermissionAwareActivity();
+                                            if (activity != null) {
+                                                int originRequestCode = 999;
+                                                activity.requestPermissions(PERMISSIONS, originRequestCode, new PermissionListener() {
+                                                    @Override
+                                                    public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+                                                        Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult requestCode=" + requestCode);
+                                                        Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult permissions=" + Arrays.toString(permissions));
+                                                        Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult grantResults=" + Arrays.toString(grantResults));
+                                                        boolean isAllGranted = true;
+                                                        for (int index = 0; index < grantResults.length; index++) {
+                                                            if (grantResults[index] != PackageManager.PERMISSION_GRANTED) {
+                                                                isAllGranted = false;
+                                                                break;
                                                             }
                                                         }
+                                                        if (requestCode == originRequestCode && isAllGranted) {
+                                                            Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult all granted, doWrapCallback");
+                                                            doWrapCallback(mContentUri);
+                                                            mContentUri = null;
+                                                            return true;
+                                                        }
+                                                        mContentUri = null;
+                                                        Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult not all granted, return false");
+                                                        return false;
                                                     }
-                                            );
-                                            if (SDK_INT > 22) {
-                                                String[] PERMISSIONS;
-                                                if (SDK_INT > 32) {
-                                                    PERMISSIONS = new String[]{Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO,};
-                                                } else {
-                                                    PERMISSIONS = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
-                                                }
-                                                if (!hasPermissions(currentActivity, PERMISSIONS)) {
-                                                    multiplePermissionsContract.launch(PERMISSIONS);
-                                                } else {
-                                                    doCallback(imagePath);
-                                                }
-                                            } else {
-                                                doCallback(imagePath);
+                                                });
+                                            }else {
+                                                Log.e("ScreenShot", "getPermissionAwareActivity is null, just return");
+                                                mContentUri = null;
                                             }
+                                        } else {
+                                            Log.d("ScreenShot", "hasPermissions true");
+                                            doWrapCallback(contentUri);
                                         }
-                                    });
+                                    } else {
+                                        Log.d("ScreenShot", "doCallback SDK_INT <= 22");
+                                        doWrapCallback(contentUri);
+                                    }
                                 }
                             }
                     );
+                    Log.d("ScreenShot", "startListen");
                     manager.startListen();
                     promise.resolve("success");
                 }
@@ -353,4 +391,8 @@ public class ScreenShot extends ReactContextBaseJavaModule {
         return result;
     }
 
+    private PermissionAwareActivity getPermissionAwareActivity() {
+        Activity activity = getCurrentActivity();
+        return (PermissionAwareActivity) activity;
+    }
 }

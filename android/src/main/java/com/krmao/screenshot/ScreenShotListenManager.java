@@ -89,9 +89,9 @@ public class ScreenShotListenManager {
         if (sScreenRealSize == null) {
             sScreenRealSize = getRealScreenSize();
             if (sScreenRealSize != null) {
-                Log.e("lewinScreen","Screen Real Size: " + sScreenRealSize.x + " * " + sScreenRealSize.y);
+                Log.w("ScreenShot","Screen Real Size: " + sScreenRealSize.x + " * " + sScreenRealSize.y);
             } else {
-                Log.e("lewinScreen","Get screen real size failed.");
+                Log.w("ScreenShot","Get screen real size failed.");
             }
         }
         mFileKeyWords = fileKeyWords;
@@ -183,11 +183,11 @@ public class ScreenShotListenManager {
             );
 
             if (cursor == null) {
-                Log.e("lewinScreen","Deviant logic.");
+                Log.w("ScreenShot","Deviant logic.");
                 return;
             }
             if (!cursor.moveToFirst()) {
-                Log.e("lewinScreen","Cursor no data.");
+                Log.w("ScreenShot","Cursor no data.");
                 return;
             }
 
@@ -218,20 +218,18 @@ public class ScreenShotListenManager {
 
             // 处理获取到的第一行数据
             if (checkScreenShot(data, dateTaken, width, height)) {
-                Log.e("lewinScreen","ScreenShot: path = " + data + "; size = " + width + " * " + height
+                Log.w("ScreenShot","ScreenShot: path = " + data + "; size = " + width + " * " + height
                         + "; date = " + dateTaken);
                 if (listener != null && !checkCallback(data)) {
                     listener.onShot(data);
                 }
             } else {
                 // 如果在观察区间媒体数据库有数据改变，又不符合截屏规则，则输出到 log 待分析
-                Log.e("lewinScreen","Media content changed, but not screenshot: path = " + data
+                Log.w("ScreenShot","Media content changed, but not screenshot: path = " + data
                         + "; size = " + width + " * " + height + "; date = " + dateTaken);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
-
         } finally {
             if (cursor != null && !cursor.isClosed()) {
                 cursor.close();
@@ -253,8 +251,8 @@ public class ScreenShotListenManager {
         /*
          * 判断依据一: 时间判断
          */
-        // 如果加入数据库的时间在开始监听之前, 或者与当前时间相差大于10秒, 则认为当前没有截屏
-        if (dateTaken < mStartListenTime || (System.currentTimeMillis() - dateTaken) > 10 * 1000) {
+        // 如果加入数据库的时间在开始监听之前, 或者与当前时间相差大于15秒, 则认为当前没有截屏
+        if (dateTaken < mStartListenTime || (System.currentTimeMillis() - dateTaken) > 15 * 1000) {
             return false;
         }
 
