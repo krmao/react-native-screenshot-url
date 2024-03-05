@@ -20,7 +20,7 @@
     "screencapture"
   ],
   "author": "krmao",
-  "license": "MIT",
+  "license": "ISC",
   "bugs": {
     "url": "https://github.com/krmao/react-native-screenshot-url/issues"
   },
