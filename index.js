@@ -21,7 +21,7 @@ export default class ScreenShotUtil {
         if (SDK_INT > 22) {
             if (SDK_INT > 32) {
                 console.log("---- checkPermissionsForScreenShot > 32")
-                return (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES)) && (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_VEDIO));
+                return (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES)) && (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO));
             } else {
                 console.log("---- checkPermissionsForScreenShot > 22")
                 return await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE)
@@ -43,7 +43,7 @@ export default class ScreenShotUtil {
             if (SDK_INT > 32) {
                 console.log("---- requestPermissionsForScreenShot > 32")
                 return await PermissionsAndroid.requestMultiple([PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-                    PermissionsAndroid.PERMISSIONS.READ_MEDIA_VEDIO
+                    PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO
                 ]);
             } else {
                 console.log("---- requestPermissionsForScreenShot > 22")
@@ -81,7 +81,7 @@ export default class ScreenShotUtil {
         screenShotEmitter && screenShotEmitter.removeAllListeners('ScreenShot')
         screenShotEmitter = Platform.OS === 'ios' ? new NativeEventEmitter(ScreenShot) : DeviceEventEmitter;
         screenShotEmitter.addListener('ScreenShot', (data) => {
-            console.log("---- startListenerWithoutPermission callBack", data)
+            console.log("---- startListenerWithoutPermission callBack data.uri=", (!!data? data.uri : 'null'))
             if (callBack) {
                 callBack(data)
             }
