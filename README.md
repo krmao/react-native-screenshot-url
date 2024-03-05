@@ -1,6 +1,15 @@
-# react-native-screen-capture
-react-native 获取系统截屏通知并获取图片/截取当前屏幕
+# react-native-screenshot-url
 
-参考： https://github.com/LewinJun/react-native-lewin-screen-capture/tree/master
-修复bug：鸿蒙4无法监听到截屏
+```typescript
+import ScreenShotUtil from 'react-native-screenshot-url';
 
+useEffect(() => {
+    ScreenShotUtil.startListener((res: any) => {
+        console.log('- startScreenShot uri=' + res.uri);
+    }, '截屏,screen');
+
+    return () => {
+        ScreenShotUtil.stopListener();
+    };
+}
+```

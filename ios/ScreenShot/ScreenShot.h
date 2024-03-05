@@ -1,9 +1,6 @@
 //
-//  ScreenCapture.h
-//  ScreenCapture
-//
-//  Created by lewin on 2018/10/11.
-//  Copyright © 2018年 lewin. All rights reserved.
+//  ScreenShot.h
+//  ScreenShot
 //
 
 #import <Foundation/Foundation.h>
@@ -22,6 +19,6 @@
 #import "RCTEventEmitter.h"
 #endif
 
-@interface ScreenCapture : RCTEventEmitter <RCTBridgeModule>
+@interface ScreenShot : RCTEventEmitter <RCTBridgeModule>
 
 @end

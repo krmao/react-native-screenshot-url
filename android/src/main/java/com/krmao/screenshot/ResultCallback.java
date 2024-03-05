@@ -1,6 +1,5 @@
-package com.lewin.capture;
+package com.krmao.screenshot;
 
-import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
 
 public interface ResultCallback {

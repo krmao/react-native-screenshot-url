@@ -1,4 +1,4 @@
-package com.lewin.capture;
+package com.krmao.screenshot;
 
 import android.content.Context;
 import android.database.ContentObserver;
@@ -19,7 +19,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ScreenCapturetListenManager {
+public class ScreenShotListenManager {
 
     /**
      * 读取媒体数据库时需要读取的列
@@ -77,7 +77,7 @@ public class ScreenCapturetListenManager {
      */
     private final Handler mUiHandler = new Handler(Looper.getMainLooper());
 
-    private ScreenCapturetListenManager(Context context, String[] fileKeyWords) {
+    private ScreenShotListenManager(Context context, String[] fileKeyWords) {
         if (context == null) {
             throw new IllegalArgumentException("The context must not be null.");
         }
@@ -95,9 +95,9 @@ public class ScreenCapturetListenManager {
         mFileKeyWords = fileKeyWords;
     }
 
-    public static ScreenCapturetListenManager newInstance(Context context, String[] fileKeyWords) {
+    public static ScreenShotListenManager newInstance(Context context, String[] fileKeyWords) {
         assertInMainThread();
-        return new ScreenCapturetListenManager(context, fileKeyWords);
+        return new ScreenShotListenManager(context, fileKeyWords);
     }
 
     /**

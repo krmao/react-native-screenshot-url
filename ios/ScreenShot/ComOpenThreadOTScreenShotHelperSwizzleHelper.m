@@ -6,11 +6,11 @@
 //
 //
 
-#import "ComOpenThreadOTScreenshotHelperSwizzleHelper.h"
+#import "ComOpenThreadOTScreenShotHelperSwizzleHelper.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
 
-@implementation ComOpenThreadOTScreenshotHelperSwizzleHelper
+@implementation ComOpenThreadOTScreenShotHelperSwizzleHelper
 
 + (void)swizzClass:(Class)c selector:(SEL)orig selector:(SEL)replace
 {

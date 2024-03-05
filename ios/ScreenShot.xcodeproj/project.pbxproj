@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		070153B2216F3AD300D7A360 /* ScreenCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = 070153B1216F3AD300D7A360 /* ScreenCapture.m */; };
-		070153B3216F3AD300D7A360 /* ScreenCapture.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 070153B0216F3AD300D7A360 /* ScreenCapture.h */; };
-		070153FA216F5E4E00D7A360 /* ComOpenThreadOTScreenshotHelperSwizzleHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 070153F6216F5E4E00D7A360 /* ComOpenThreadOTScreenshotHelperSwizzleHelper.m */; };
-		070153FB216F5E4E00D7A360 /* UIView+ComOpenThreadOTScreenshotHelperStatusBarReference.m in Sources */ = {isa = PBXBuildFile; fileRef = 070153F9216F5E4E00D7A360 /* UIView+ComOpenThreadOTScreenshotHelperStatusBarReference.m */; };
+		070153B2216F3AD300D7A360 /* ScreenShot.m in Sources */ = {isa = PBXBuildFile; fileRef = 070153B1216F3AD300D7A360 /* ScreenShot.m */; };
+		070153B3216F3AD300D7A360 /* ScreenShot.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 070153B0216F3AD300D7A360 /* ScreenShot.h */; };
+		070153FA216F5E4E00D7A360 /* ComOpenThreadOTScreenShotHelperSwizzleHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 070153F6216F5E4E00D7A360 /* ComOpenThreadOTScreenShotHelperSwizzleHelper.m */; };
+		070153FB216F5E4E00D7A360 /* UIView+ComOpenThreadOTScreenShotHelperStatusBarReference.m in Sources */ = {isa = PBXBuildFile; fileRef = 070153F9216F5E4E00D7A360 /* UIView+ComOpenThreadOTScreenShotHelperStatusBarReference.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -20,20 +20,20 @@
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
-				070153B3216F3AD300D7A360 /* ScreenCapture.h in CopyFiles */,
+				070153B3216F3AD300D7A360 /* ScreenShot.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		070153AD216F3AD300D7A360 /* libScreenCapture.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libScreenCapture.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		070153B0216F3AD300D7A360 /* ScreenCapture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScreenCapture.h; sourceTree = "<group>"; };
-		070153B1216F3AD300D7A360 /* ScreenCapture.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ScreenCapture.m; sourceTree = "<group>"; };
-		070153F6216F5E4E00D7A360 /* ComOpenThreadOTScreenshotHelperSwizzleHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ComOpenThreadOTScreenshotHelperSwizzleHelper.m; sourceTree = "<group>"; };
-		070153F7216F5E4E00D7A360 /* UIView+ComOpenThreadOTScreenshotHelperStatusBarReference.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+ComOpenThreadOTScreenshotHelperStatusBarReference.h"; sourceTree = "<group>"; };
-		070153F8216F5E4E00D7A360 /* ComOpenThreadOTScreenshotHelperSwizzleHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ComOpenThreadOTScreenshotHelperSwizzleHelper.h; sourceTree = "<group>"; };
-		070153F9216F5E4E00D7A360 /* UIView+ComOpenThreadOTScreenshotHelperStatusBarReference.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+ComOpenThreadOTScreenshotHelperStatusBarReference.m"; sourceTree = "<group>"; };
+		070153AD216F3AD300D7A360 /* libScreenShot.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libScreenShot.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		070153B0216F3AD300D7A360 /* ScreenShot.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScreenShot.h; sourceTree = "<group>"; };
+		070153B1216F3AD300D7A360 /* ScreenShot.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ScreenShot.m; sourceTree = "<group>"; };
+		070153F6216F5E4E00D7A360 /* ComOpenThreadOTScreenShotHelperSwizzleHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ComOpenThreadOTScreenShotHelperSwizzleHelper.m; sourceTree = "<group>"; };
+		070153F7216F5E4E00D7A360 /* UIView+ComOpenThreadOTScreenShotHelperStatusBarReference.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+ComOpenThreadOTScreenShotHelperStatusBarReference.h"; sourceTree = "<group>"; };
+		070153F8216F5E4E00D7A360 /* ComOpenThreadOTScreenShotHelperSwizzleHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ComOpenThreadOTScreenShotHelperSwizzleHelper.h; sourceTree = "<group>"; };
+		070153F9216F5E4E00D7A360 /* UIView+ComOpenThreadOTScreenShotHelperStatusBarReference.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+ComOpenThreadOTScreenShotHelperStatusBarReference.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,7 +50,7 @@
 		070153A4216F3AD300D7A360 = {
 			isa = PBXGroup;
 			children = (
-				070153AF216F3AD300D7A360 /* ScreenCapture */,
+				070153AF216F3AD300D7A360 /* ScreenShot */,
 				070153AE216F3AD300D7A360 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -58,30 +58,30 @@
 		070153AE216F3AD300D7A360 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				070153AD216F3AD300D7A360 /* libScreenCapture.a */,
+				070153AD216F3AD300D7A360 /* libScreenShot.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		070153AF216F3AD300D7A360 /* ScreenCapture */ = {
+		070153AF216F3AD300D7A360 /* ScreenShot */ = {
 			isa = PBXGroup;
 			children = (
-				070153F8216F5E4E00D7A360 /* ComOpenThreadOTScreenshotHelperSwizzleHelper.h */,
-				070153F6216F5E4E00D7A360 /* ComOpenThreadOTScreenshotHelperSwizzleHelper.m */,
-				070153F7216F5E4E00D7A360 /* UIView+ComOpenThreadOTScreenshotHelperStatusBarReference.h */,
-				070153F9216F5E4E00D7A360 /* UIView+ComOpenThreadOTScreenshotHelperStatusBarReference.m */,
-				070153B0216F3AD300D7A360 /* ScreenCapture.h */,
-				070153B1216F3AD300D7A360 /* ScreenCapture.m */,
+				070153F8216F5E4E00D7A360 /* ComOpenThreadOTScreenShotHelperSwizzleHelper.h */,
+				070153F6216F5E4E00D7A360 /* ComOpenThreadOTScreenShotHelperSwizzleHelper.m */,
+				070153F7216F5E4E00D7A360 /* UIView+ComOpenThreadOTScreenShotHelperStatusBarReference.h */,
+				070153F9216F5E4E00D7A360 /* UIView+ComOpenThreadOTScreenShotHelperStatusBarReference.m */,
+				070153B0216F3AD300D7A360 /* ScreenShot.h */,
+				070153B1216F3AD300D7A360 /* ScreenShot.m */,
 			);
-			path = ScreenCapture;
+			path = ScreenShot;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		070153AC216F3AD300D7A360 /* ScreenCapture */ = {
+		070153AC216F3AD300D7A360 /* ScreenShot */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 070153B6216F3AD300D7A360 /* Build configuration list for PBXNativeTarget "ScreenCapture" */;
+			buildConfigurationList = 070153B6216F3AD300D7A360 /* Build configuration list for PBXNativeTarget "ScreenShot" */;
 			buildPhases = (
 				070153A9216F3AD300D7A360 /* Sources */,
 				070153AA216F3AD300D7A360 /* Frameworks */,
@@ -91,9 +91,9 @@
 			);
 			dependencies = (
 			);
-			name = ScreenCapture;
-			productName = ScreenCapture;
-			productReference = 070153AD216F3AD300D7A360 /* libScreenCapture.a */;
+			name = ScreenShot;
+			productName = ScreenShot;
+			productReference = 070153AD216F3AD300D7A360 /* libScreenShot.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -103,14 +103,14 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0940;
-				ORGANIZATIONNAME = lewin;
+				ORGANIZATIONNAME = krmao;
 				TargetAttributes = {
 					070153AC216F3AD300D7A360 = {
 						CreatedOnToolsVersion = 9.4.1;
 					};
 				};
 			};
-			buildConfigurationList = 070153A8216F3AD300D7A360 /* Build configuration list for PBXProject "ScreenCapture" */;
+			buildConfigurationList = 070153A8216F3AD300D7A360 /* Build configuration list for PBXProject "ScreenShot" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -122,7 +122,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				070153AC216F3AD300D7A360 /* ScreenCapture */,
+				070153AC216F3AD300D7A360 /* ScreenShot */,
 			);
 		};
 /* End PBXProject section */
@@ -132,9 +132,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				070153FB216F5E4E00D7A360 /* UIView+ComOpenThreadOTScreenshotHelperStatusBarReference.m in Sources */,
-				070153B2216F3AD300D7A360 /* ScreenCapture.m in Sources */,
-				070153FA216F5E4E00D7A360 /* ComOpenThreadOTScreenshotHelperSwizzleHelper.m in Sources */,
+				070153FB216F5E4E00D7A360 /* UIView+ComOpenThreadOTScreenShotHelperStatusBarReference.m in Sources */,
+				070153B2216F3AD300D7A360 /* ScreenShot.m in Sources */,
+				070153FA216F5E4E00D7A360 /* ComOpenThreadOTScreenShotHelperSwizzleHelper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -300,7 +300,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		070153A8216F3AD300D7A360 /* Build configuration list for PBXProject "ScreenCapture" */ = {
+		070153A8216F3AD300D7A360 /* Build configuration list for PBXProject "ScreenShot" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				070153B4216F3AD300D7A360 /* Debug */,
@@ -309,7 +309,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		070153B6216F3AD300D7A360 /* Build configuration list for PBXNativeTarget "ScreenCapture" */ = {
+		070153B6216F3AD300D7A360 /* Build configuration list for PBXNativeTarget "ScreenShot" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				070153B7216F3AD300D7A360 /* Debug */,

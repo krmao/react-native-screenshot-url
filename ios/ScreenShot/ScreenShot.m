@@ -1,19 +1,16 @@
 //
-//  ScreenCapture.m
-//  ScreenCapture
-//
-//  Created by lewin on 2018/10/11.
-//  Copyright © 2018年 lewin. All rights reserved.
+//  ScreenShot.m
+//  ScreenShot
 //
 
-#import "ScreenCapture.h"
+#import "ScreenShot.h"
 #import <UIKit/UIKit.h>
-#import "UIView+ComOpenThreadOTScreenshotHelperStatusBarReference.h"
+#import "UIView+ComOpenThreadOTScreenShotHelperStatusBarReference.h"
 #import <QuartzCore/QuartzCore.h>
 
-#define PATH @"lewin-screen-capture"
+#define PATH @"krmao-screen-shot"
 
-@implementation ScreenCapture
+@implementation ScreenShot
 RCT_EXPORT_MODULE();
 
 RCT_EXPORT_METHOD(startListener:(RCTPromiseResolveBlock)success failure:(RCTResponseErrorBlock)failure){
@@ -22,7 +19,7 @@ RCT_EXPORT_METHOD(startListener:(RCTPromiseResolveBlock)success failure:(RCTResp
             [self startListener];
             success(@"true");
         }@catch(NSException *ex){
-            NSString *domain = @"lewin.error";
+            NSString *domain = @"krmao.error";
             NSString *desc = NSLocalizedString(@"开启失败", @"");
             NSDictionary *userInfo = @{ NSLocalizedDescriptionKey : desc };
             NSError *error = [NSError errorWithDomain:domain
@@ -33,12 +30,12 @@ RCT_EXPORT_METHOD(startListener:(RCTPromiseResolveBlock)success failure:(RCTResp
     });
 }
 
-RCT_EXPORT_METHOD(screenCapture:(BOOL)isHiddenStatus extension:(nonnull NSString*)extension quality:(nonnull NSNumber*)quality scale:(nonnull NSNumber*)scale success:(RCTPromiseResolveBlock)success failure:(RCTResponseErrorBlock)failure){
+RCT_EXPORT_METHOD(screenShot:(BOOL)isHiddenStatus extension:(nonnull NSString*)extension quality:(nonnull NSNumber*)quality scale:(nonnull NSNumber*)scale success:(RCTPromiseResolveBlock)success failure:(RCTResponseErrorBlock)failure){
     dispatch_sync(dispatch_get_main_queue(), ^{
         @try{
             success([self screenImage: isHiddenStatus extension:extension quality:quality scale:scale]);
         }@catch(NSException *ex){
-            NSString *domain = @"lewin.error";
+            NSString *domain = @"krmao.error";
             NSString *desc = NSLocalizedString(@"开启失败", @"");
             NSDictionary *userInfo = @{ NSLocalizedDescriptionKey : desc };
             NSError *error = [NSError errorWithDomain:domain
@@ -55,7 +52,7 @@ RCT_EXPORT_METHOD(stopListener:(RCTPromiseResolveBlock)success failure:(RCTRespo
             [self stopListener];
             success(@"true");
         }@catch(NSException *ex){
-            NSString *domain = @"lewin.error";
+            NSString *domain = @"krmao.error";
             NSString *desc = NSLocalizedString(@"开启失败", @"");
             NSDictionary *userInfo = @{ NSLocalizedDescriptionKey : desc };
             NSError *error = [NSError errorWithDomain:domain
@@ -70,7 +67,7 @@ RCT_EXPORT_METHOD(clearCache:(RCTPromiseResolveBlock)success failure:(RCTRespons
     dispatch_sync(dispatch_get_main_queue(), ^{
         @try{
             NSArray *paths =NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
-            
+
             NSFileManager *fileManager = [NSFileManager defaultManager];
             NSString *path =[[paths objectAtIndex:0]stringByAppendingPathComponent:PATH];
             NSLog(@"count: %lu", [[fileManager enumeratorAtPath:path].allObjects count]);
@@ -82,7 +79,7 @@ RCT_EXPORT_METHOD(clearCache:(RCTPromiseResolveBlock)success failure:(RCTRespons
                 success(@{@"code": @"500", @"errMsg":@"删除失败"});
             }
         }@catch(NSException *ex){
-            NSString *domain = @"lewin.error";
+            NSString *domain = @"krmao.error";
             NSString *desc = NSLocalizedString(@"开启失败", @"");
             NSDictionary *userInfo = @{ NSLocalizedDescriptionKey : desc };
             NSError *error = [NSError errorWithDomain:domain
@@ -96,19 +93,19 @@ RCT_EXPORT_METHOD(clearCache:(RCTPromiseResolveBlock)success failure:(RCTRespons
 - (void) startListener {
 //    AppDelegate *appDele = (AppDelegate *)[UIApplication sharedApplication].delegate;
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(getScreenshot:)
-                                                 name:UIApplicationUserDidTakeScreenshotNotification object:nil];
+                                             selector:@selector(getScreenShot:)
+                                                 name:UIApplicationUserDidTakeScreenShotNotification object:nil];
 }
 
 - (void) stopListener {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationUserDidTakeScreenshotNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationUserDidTakeScreenShotNotification object:nil];
 }
 
 -(NSArray<NSString *> *)supportedEvents {
-    return @[@"ScreenCapture"];
+    return @[@"ScreenShot"];
 }
 
-- (void)getScreenshot:(NSNotification *)notification{
+- (void)getScreenShot:(NSNotification *)notification{
     NSLog(@"捕捉截屏事件");
 
 //    CGSize imageSize = CGSizeZero;
@@ -132,14 +129,14 @@ RCT_EXPORT_METHOD(clearCache:(RCTPromiseResolveBlock)success failure:(RCTRespons
 //         }
 //         CGContextRestoreGState(context);
 //     }
-    [self sendEventWithName:@"ScreenCapture" body:[self screenImage:NO extension:@"png" quality:[NSNumber numberWithInt:100] scale:[NSNumber numberWithFloat:0]]];
+    [self sendEventWithName:@"ScreenShot" body:[self screenImage:NO extension:@"png" quality:[NSNumber numberWithInt:100] scale:[NSNumber numberWithFloat:0]]];
 }
 
 - (NSDictionary*) screenImage:(BOOL)isHiddenStatus extension:(NSString*)extension quality:(NSNumber*)quality scale:(NSNumber*)scale {
     @try{
         UIImage *image = isHiddenStatus ? [self screenshotWithStatusBar:false] : [self screenshot];
         NSArray *paths =NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
-        
+
         NSFileManager *fileManager = [NSFileManager defaultManager];
         NSString *path =[[paths objectAtIndex:0]stringByAppendingPathComponent:PATH];
         if (![fileManager fileExistsAtPath:path]) {
@@ -149,10 +146,10 @@ RCT_EXPORT_METHOD(clearCache:(RCTPromiseResolveBlock)success failure:(RCTRespons
         NSString *filePath = @"";
         if ([extension isEqualToString:@"jpeg"] || [extension isEqualToString:@"jpg"]) {
             filePath = [path stringByAppendingPathComponent:
-                              [NSString stringWithFormat:@"screen-capture-%ld.jpg", time]];
+                              [NSString stringWithFormat:@"screen-shot-%ld.jpg", time]];
         } else {
             filePath = [path stringByAppendingPathComponent:
-                              [NSString stringWithFormat:@"screen-capture-%ld.png", time]];
+                              [NSString stringWithFormat:@"screen-shot-%ld.png", time]];
         }
         NSString *encodedImageStr = @"";
         @try{
@@ -210,10 +207,10 @@ RCT_EXPORT_METHOD(clearCache:(RCTPromiseResolveBlock)success failure:(RCTRespons
         UIGraphicsBeginImageContextWithOptions(imageSize, NO, 0);
     else
         UIGraphicsBeginImageContext(imageSize);
-    
+
     CGContextRef context = UIGraphicsGetCurrentContext();
-    
-    
+
+
     // -renderInContext: renders in the coordinate space of the layer,
     // so we must first apply the layer's geometry to the graphics context
     CGContextSaveGState(context);
@@ -225,18 +222,18 @@ RCT_EXPORT_METHOD(clearCache:(RCTPromiseResolveBlock)success failure:(RCTRespons
     CGContextTranslateCTM(context,
                           -[view bounds].size.width * [[view layer] anchorPoint].x,
                           -[view bounds].size.height * [[view layer] anchorPoint].y);
-    
+
     // Render the layer hierarchy to the current context
     [[view layer] renderInContext:context];
-    
+
     // Restore the context
     CGContextRestoreGState(context);
-    
+
     // Retrieve the screenshot image
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    
+
     UIGraphicsEndImageContext();
-    
+
     return image;
 }
 
@@ -266,14 +263,14 @@ RCT_EXPORT_METHOD(clearCache:(RCTPromiseResolveBlock)success failure:(RCTRespons
     UIInterfaceOrientation o = [[UIApplication sharedApplication] statusBarOrientation];
     return [self screenshotWithStatusBar:withStatusBar rect:rect orientation:o];
 #else
-    return [self doScreenshotWithStatusBar:withStatusBar rect:rect];
+    return [self doScreenShotWithStatusBar:withStatusBar rect:rect];
 #endif
 }
 
 #if TARGET_OS_IOS
 - (UIImage *)screenshotWithStatusBar:(BOOL)withStatusBar rect:(CGRect)rect orientation:(UIInterfaceOrientation)o
 #else
-- (UIImage *)doScreenshotWithStatusBar:(BOOL)withStatusBar rect:(CGRect)rect
+- (UIImage *)doScreenShotWithStatusBar:(BOOL)withStatusBar rect:(CGRect)rect
 #endif
 {
     CGRect screenRect = [[UIScreen mainScreen] bounds];
@@ -332,10 +329,10 @@ RCT_EXPORT_METHOD(clearCache:(RCTPromiseResolveBlock)success failure:(RCTRespons
     {
         UIGraphicsBeginImageContext(rect.size);
     }
-    
+
     CGContextRef context = UIGraphicsGetCurrentContext();
-    
-    BOOL hasTakenStatusBarScreenshot = NO;
+
+    BOOL hasTakenStatusBarScreenShot = NO;
     // Iterate over every window from back to front
     for (UIWindow *window in [[UIApplication sharedApplication] windows])
     {
@@ -344,7 +341,7 @@ RCT_EXPORT_METHOD(clearCache:(RCTPromiseResolveBlock)success failure:(RCTRespons
             // -renderInContext: renders in the coordinate space of the layer,
             // so we must first apply the layer's geometry to the graphics context
             CGContextSaveGState(context);
-            
+
             // Apply pre tranform to context.
             // to convert all interface orientation situation to portrait situation.
             CGContextConcatCTM(context, preTransform);
@@ -356,44 +353,44 @@ RCT_EXPORT_METHOD(clearCache:(RCTPromiseResolveBlock)success failure:(RCTRespons
             CGContextTranslateCTM(context,
                                   -[window bounds].size.width * [[window layer] anchorPoint].x,
                                   -[window bounds].size.height * [[window layer] anchorPoint].y);
-            
-            
+
+
             // Render the layer hierarchy to the current context
             [[window layer] renderInContext:context];
-            
+
             // Restore the context
             CGContextRestoreGState(context);
         }
 
 #if TARGET_OS_IOS
-        // Screenshot status bar if next window's window level > status bar window level
+        // ScreenShot status bar if next window's window level > status bar window level
         NSArray *windows = [[UIApplication sharedApplication] windows];
         NSUInteger currentWindowIndex = [windows indexOfObject:window];
         if (windows.count > currentWindowIndex - 1)
         {
             UIWindow *nextWindow = [windows objectAtIndex:currentWindowIndex - 1];
-            if (withStatusBar && nextWindow.windowLevel > UIWindowLevelStatusBar && !hasTakenStatusBarScreenshot)
+            if (withStatusBar && nextWindow.windowLevel > UIWindowLevelStatusBar && !hasTakenStatusBarScreenShot)
             {
                 [self mergeStatusBarToContext:context rect:rect screenshotOrientation:o];
-                hasTakenStatusBarScreenshot = YES;
+                hasTakenStatusBarScreenShot = YES;
             }
         }
         else
         {
-            if (withStatusBar && !hasTakenStatusBarScreenshot)
+            if (withStatusBar && !hasTakenStatusBarScreenShot)
             {
                 [self mergeStatusBarToContext:context rect:rect screenshotOrientation:o];
-                hasTakenStatusBarScreenshot = YES;
+                hasTakenStatusBarScreenShot = YES;
             }
         }
 #endif
     }
-    
+
     // Retrieve the screenshot image
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    
+
     UIGraphicsEndImageContext();
-    
+
     return image;
 }
 
@@ -402,7 +399,7 @@ RCT_EXPORT_METHOD(clearCache:(RCTPromiseResolveBlock)success failure:(RCTRespons
                            rect:(CGRect)rect
           screenshotOrientation:(UIInterfaceOrientation)o
 {
-    UIView *statusBarView = [UIView statusBarInstance_ComOpenThreadOTScreenshotHelper];
+    UIView *statusBarView = [UIView statusBarInstance_ComOpenThreadOTScreenShotHelper];
     CGFloat screenWidth = [[UIScreen mainScreen] bounds].size.width;
     CGFloat screenHeight = [[UIScreen mainScreen] bounds].size.height;
     CGAffineTransform preTransform = CGAffineTransformIdentity;
@@ -470,10 +467,10 @@ RCT_EXPORT_METHOD(clearCache:(RCTPromiseResolveBlock)success failure:(RCTRespons
     CGContextTranslateCTM(context,
                           -[statusBarView bounds].size.width * [[statusBarView layer] anchorPoint].x,
                           -[statusBarView bounds].size.height * [[statusBarView layer] anchorPoint].y);
-    
+
     // Render the layer hierarchy to the current context
     [[statusBarView layer] renderInContext:context];
-    
+
     // Restore the context
     CGContextRestoreGState(context);
 }

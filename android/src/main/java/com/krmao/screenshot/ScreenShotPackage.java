@@ -1,4 +1,6 @@
-package com.lewin.capture;
+package com.krmao.screenshot;
+
+import androidx.annotation.NonNull;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
@@ -9,22 +11,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Created by lewin on 2018/3/14.
- */
-
-public class ScreenCapturePackage implements ReactPackage {
+@SuppressWarnings("rawtypes")
+public class ScreenShotPackage implements ReactPackage {
+    @NonNull
     @Override
-    public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
+    public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
 
-        modules.add(new ScreenCapture(reactContext));
+        modules.add(new ScreenShot(reactContext));
 
         return modules;
     }
 
+    @NonNull
     @Override
-    public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
+    public List<ViewManager> createViewManagers(@NonNull ReactApplicationContext reactContext) {
         return Collections.emptyList();
     }
 }

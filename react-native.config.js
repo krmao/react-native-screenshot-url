@@ -1,3 +1,5 @@
+// noinspection JSUnresolvedReference
+
 module.exports = {
   dependency: {
     platforms: {
@@ -11,8 +13,8 @@ module.exports = {
       platforms: {
         android: {
           sourceDir: __dirname + "/android",
-          packageImportPath: "import com.lewin.capture.ScreenCapturePackage;",
-          packageInstance: "new ScreenCapturePackage()",
+          packageImportPath: "import com.krmao.screenshot.ScreenShotPackage;",
+          packageInstance: "new ScreenShotPackage()",
         },
       },
     },

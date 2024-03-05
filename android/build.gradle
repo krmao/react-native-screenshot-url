@@ -6,8 +6,7 @@ def safeExtGet(prop, fallback) {
 
 def computeVersionName() {
     // dynamically retrieve version from package.json
-    def slurper = new JsonSlurper()
-    def json = slurper.parse(file('../package.json'), "utf-8")
+    def json = new JsonSlurper().parse(file('../package.json'), "utf-8")
     return json.version
 }
 

@@ -1,19 +1,21 @@
-package com.lewin.capture;
-
+package com.krmao.screenshot;
 
 
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
-import android.graphics.Matrix;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.Build;
 import android.os.Environment;
+import android.util.Base64;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import android.util.Base64;
+
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -33,28 +35,24 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
+@SuppressWarnings({"ConstantConditions", "ToArrayCallWithZeroLengthArrayArgument", "unused", "JavadocDeclaration", "ResultOfMethodCallIgnored", "ForLoopReplaceableByForEach"})
+public class ScreenShot extends ReactContextBaseJavaModule {
 
+    private final ReactApplicationContext reactContext;
 
-/**
- * Created by lewin on 2018/3/14.
- */
+    private ScreenShotListenManager manager;
 
-public class ScreenCapture extends ReactContextBaseJavaModule {
+    private final static String path = "/screenshot/";
 
-    private ReactApplicationContext reactContext;
-
-    private ScreenCapturetListenManager manager;
-
-    private final static String path = "/screen-capture/";
-
-    public ScreenCapture(ReactApplicationContext reactContext) {
+    public ScreenShot(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
     }
 
+    @NonNull
     @Override
     public String getName() {
-        return "ScreenCapture";
+        return "ScreenShot";
     }
 
     @ReactMethod
@@ -166,9 +164,9 @@ public class ScreenCapture extends ReactContextBaseJavaModule {
                 public void run() {
                     //此时已在主线程中，可以更新UI了
                     // 开始监听
-                    manager = ScreenCapturetListenManager.newInstance(reactContext, keywords);
+                    manager = ScreenShotListenManager.newInstance(reactContext, keywords);
                     manager.setListener(
-                            new ScreenCapturetListenManager.OnScreenCapturetListen() {
+                            new ScreenShotListenManager.OnScreenCapturetListen() {
                                 public void onShot(String imagePath) {
                                     // 获取到系统文件
                                     WritableMap map = Arguments.createMap();
@@ -224,9 +222,9 @@ public class ScreenCapture extends ReactContextBaseJavaModule {
             }
         };
         if (isHiddenStatus) {
-            ScreenUtils.snapShotWithoutStatusBar(context, captureCallback);
+            ScreenShotUtils.snapShotWithoutStatusBar(context, captureCallback);
         } else {
-            ScreenUtils.snapShotWithStatusBar(context, captureCallback);
+            ScreenShotUtils.snapShotWithStatusBar(context, captureCallback);
         }
     }
 
@@ -262,8 +260,6 @@ public class ScreenCapture extends ReactContextBaseJavaModule {
      * Resize bitmap
      *
      * @param src
-     * @param newWidth
-     * @param newHeight
      * @return
      */
     private static Bitmap resizeBitmap(Bitmap src, float scale) {
@@ -284,7 +280,6 @@ public class ScreenCapture extends ReactContextBaseJavaModule {
      */
     private static Bitmap.CompressFormat extToCompressFormat(String extension) {
         switch (extension) {
-            case "png": return Bitmap.CompressFormat.PNG;
             case "jpg":
             case "jpeg": return Bitmap.CompressFormat.JPEG;
             default: return Bitmap.CompressFormat.PNG;

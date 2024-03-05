@@ -8,8 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface UIView (ComOpenThreadOTScreenshotHelperStatusBarReference)
+@interface UIView (ComOpenThreadOTScreenShotHelperStatusBarReference)
 
-+ (UIView *)statusBarInstance_ComOpenThreadOTScreenshotHelper;
++ (UIView *)statusBarInstance_ComOpenThreadOTScreenShotHelper;
 
 @end

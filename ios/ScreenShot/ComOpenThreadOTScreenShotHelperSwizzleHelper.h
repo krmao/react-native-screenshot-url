@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface ComOpenThreadOTScreenshotHelperSwizzleHelper : NSObject
+@interface ComOpenThreadOTScreenShotHelperSwizzleHelper : NSObject
 
 + (void)swizzClass:(Class)c selector:(SEL)orig selector:(SEL)replace;
 
