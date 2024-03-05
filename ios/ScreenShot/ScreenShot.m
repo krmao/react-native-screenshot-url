@@ -94,11 +94,11 @@ RCT_EXPORT_METHOD(clearCache:(RCTPromiseResolveBlock)success failure:(RCTRespons
 //    AppDelegate *appDele = (AppDelegate *)[UIApplication sharedApplication].delegate;
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(getScreenShot:)
-                                                 name:UIApplicationUserDidTakeScreenShotNotification object:nil];
+                                                 name:UIApplicationUserDidTakeScreenshotNotification object:nil];
 }
 
 - (void) stopListener {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationUserDidTakeScreenShotNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationUserDidTakeScreenshotNotification object:nil];
 }
 
 -(NSArray<NSString *> *)supportedEvents {
