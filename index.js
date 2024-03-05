@@ -13,14 +13,21 @@ let screenShotEmitter = undefined
 export default class ScreenShotUtil {
     static checkPermissionsForScreenShot = async () => {
         if (Platform.OS === 'ios') {
+            console.log("---- checkPermissionsForScreenShot ios")
             return Promise.resolve(true);
         }
-        const SDK_INT = +Platform.constants.Release;
+        const SDK_INT = +Platform.constants.Version;
+        console.log("---- checkPermissionsForScreenShot SDK_INT", SDK_INT)
         if (SDK_INT > 22) {
-            return await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE) &&
-                (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES)) &&
-                (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_VEDIO));
+            if (SDK_INT > 32) {
+                console.log("---- checkPermissionsForScreenShot > 32")
+                return (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES)) && (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_VEDIO));
+            } else {
+                console.log("---- checkPermissionsForScreenShot > 22")
+                return await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE)
+            }
         } else {
+            console.log("---- checkPermissionsForScreenShot return true")
             return Promise.resolve(true);
         }
     };
@@ -30,12 +37,18 @@ export default class ScreenShotUtil {
             console.log("---- requestPermissionsForScreenShot null, ios")
             return Promise.resolve(null);
         }
-        const SDK_INT = +Platform.constants.Release;
+        const SDK_INT = +Platform.constants.Version;
         if (SDK_INT > 22) {
-            return await PermissionsAndroid.requestMultiple([PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-                PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-                PermissionsAndroid.PERMISSIONS.READ_MEDIA_VEDIO
-            ]);
+            console.log("---- requestPermissionsForScreenShot SDK_INT=", SDK_INT)
+            if (SDK_INT > 32) {
+                console.log("---- requestPermissionsForScreenShot > 32")
+                return await PermissionsAndroid.requestMultiple([PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+                    PermissionsAndroid.PERMISSIONS.READ_MEDIA_VEDIO
+                ]);
+            } else {
+                console.log("---- requestPermissionsForScreenShot > 22")
+                return await PermissionsAndroid.requestMultiple([PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE]);
+            }
         } else {
             console.log("---- requestPermissionsForScreenShot null, SDK_INT <= 22")
             return Promise.resolve(null);
@@ -49,12 +62,14 @@ export default class ScreenShotUtil {
      */
     static async startListener(callBack, keyWords) {
         if (!(await ScreenShotUtil.checkPermissionsForScreenShot())) {
+            console.log("---- checkPermissionsForScreenShot false, start requestPermissionsForScreenShot")
             await ScreenShotUtil.requestPermissionsForScreenShot();
         }
         if (await ScreenShotUtil.checkPermissionsForScreenShot()) {
+            console.log("---- checkPermissionsForScreenShot true, start startListenerWithoutPermission")
             return ScreenShotUtil.startListenerWithoutPermission(callBack, keyWords);
         } else {
-            console.log("---- checkPermissionsForScreenShot false")
+            console.log("---- checkPermissionsForScreenShot false, startListener return with null")
             return Promise.resolve(null);
         }
     }
