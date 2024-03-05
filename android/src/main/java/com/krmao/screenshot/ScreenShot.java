@@ -61,34 +61,7 @@ public class ScreenShot extends ReactContextBaseJavaModule {
         if (keywords != null && keywords.length() > 0) {
             keys = keywords.split(",");
         }
-
-        if (Build.VERSION.SDK_INT > 22) {
-            List<String> permissionList = new ArrayList<>();
-            if (Build.VERSION.SDK_INT > 32) {
-                if (ContextCompat.checkSelfPermission(reactContext, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
-                    permissionList.add(Manifest.permission.READ_MEDIA_IMAGES);
-                } else if (ContextCompat.checkSelfPermission(reactContext, Manifest.permission.READ_MEDIA_VIDEO) != PackageManager.PERMISSION_GRANTED) {
-                    permissionList.add(Manifest.permission.READ_MEDIA_VIDEO);
-                } else {
-                    this.startListenerCapture(promise, keys);
-                }
-            }else{
-                if (ContextCompat.checkSelfPermission(reactContext, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    permissionList.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-                } else {
-                    this.startListenerCapture(promise, keys);
-                }
-            }
-
-            if (permissionList != null && (permissionList.size() != 0)) {
-                Activity activity = getCurrentActivity();
-                if (activity != null) {
-                    ActivityCompat.requestPermissions(activity, permissionList.toArray(new String[permissionList.size()]), 0);
-                }
-            }
-        }else {
-            this.startListenerCapture(promise, keys);
-        }
+        this.startListenerCapture(promise, keys);
     }
 
     @ReactMethod
@@ -166,14 +139,14 @@ public class ScreenShot extends ReactContextBaseJavaModule {
                     // 开始监听
                     manager = ScreenShotListenManager.newInstance(reactContext, keywords);
                     manager.setListener(
-                            new ScreenShotListenManager.OnScreenCapturetListen() {
+                            new ScreenShotListenManager.OnScreenShotListen() {
                                 public void onShot(String imagePath) {
                                     // 获取到系统文件
                                     WritableMap map = Arguments.createMap();
                                     map.putString("code", "200");
                                     map.putString("uri", imagePath.indexOf("file://") == 0 ? imagePath : "file://" + imagePath);
                                     map.putString("base64", bitmapToBase64(BitmapFactory.decodeFile(imagePath), "png", 100));
-                                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("ScreenCapture", map);
+                                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("ScreenShot", map);
                                 }
                             }
                     );

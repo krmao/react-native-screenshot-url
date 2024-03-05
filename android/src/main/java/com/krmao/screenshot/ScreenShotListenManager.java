@@ -56,7 +56,7 @@ public class ScreenShotListenManager {
 
     private Context mContext;
 
-    private OnScreenCapturetListen mListener;
+    private OnScreenShotListen mListener;
 
     private long mStartListenTime;
 
@@ -289,8 +289,6 @@ public class ScreenShotListenManager {
                 }
             }
         }
-        
-
         return false;
     }
 
@@ -345,11 +343,11 @@ public class ScreenShotListenManager {
     /**
      * 设置截屏监听器
      */
-    public void setListener(OnScreenCapturetListen listener) {
+    public void setListener(OnScreenShotListen listener) {
         mListener = listener;
     }
 
-    public static interface OnScreenCapturetListen {
+    public static interface OnScreenShotListen {
         public void onShot(String imagePath);
     }
 
