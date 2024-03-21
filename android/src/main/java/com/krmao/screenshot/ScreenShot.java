@@ -148,19 +148,23 @@ public class ScreenShot extends ReactContextBaseJavaModule {
 
     private void doWrapCallback(Uri newContentUri) {
         Log.d("ScreenShot", "doWrapCallback handleMediaContentChange newContentUri=" + newContentUri.toString());
-        manager.handleMediaContentChange(newContentUri, new ScreenShotListenManager.OnScreenShotFinalListener() {
-            @Override
-            public void onShot(String imagePath) {
-                Log.d("ScreenShot", "doWrapCallback onShot imagePath=" + imagePath);
+        if (manager != null) {
+            manager.handleMediaContentChange(newContentUri, new ScreenShotListenManager.OnScreenShotFinalListener() {
+                @Override
+                public void onShot(String imagePath) {
+                    Log.d("ScreenShot", "doWrapCallback onShot imagePath=" + imagePath);
 
-                // 获取到系统文件
-                WritableMap map = Arguments.createMap();
-                map.putString("code", "200");
-                map.putString("uri", imagePath.indexOf("file://") == 0 ? imagePath : "file://" + imagePath);
-                map.putString("base64", bitmapToBase64(BitmapFactory.decodeFile(imagePath), "png", 100));
-                reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("ScreenShot", map);
-            }
-        });
+                    // 获取到系统文件
+                    WritableMap map = Arguments.createMap();
+                    map.putString("code", "200");
+                    map.putString("uri", imagePath.indexOf("file://") == 0 ? imagePath : "file://" + imagePath);
+                    map.putString("base64", bitmapToBase64(BitmapFactory.decodeFile(imagePath), "png", 100));
+                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("ScreenShot", map);
+                }
+            });
+        } else {
+            Log.d("ScreenShot", "doWrapCallback manager is null, ignore");
+        }
     }
 
     private void startListenerCapture(final Promise promise, final String[] keywords) {
