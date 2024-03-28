@@ -65,7 +65,7 @@ public class ScreenShotUtils {
                     .get(object).toString());
             statusHeight = context.getResources().getDimensionPixelSize(height);
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
         return statusHeight;
     }
@@ -78,6 +78,10 @@ public class ScreenShotUtils {
      * @return
      */
     public static void snapShotWithStatusBar(Activity activity, final CaptureCallback callback) {
+        if (activity == null) {
+            callback.invoke(null);
+            return;
+        }
         Window window = activity.getWindow();
         View view = window.getDecorView();
         int width = getScreenWidth(activity);
@@ -125,6 +129,10 @@ public class ScreenShotUtils {
      * @return
      */
     public static void snapShotWithoutStatusBar(Activity activity, final CaptureCallback callback) {
+        if (activity == null) {
+            callback.invoke(null);
+            return;
+        }
         Window window = activity.getWindow();
         View view = window.getDecorView();
         int statusBarHeight = getStatusHeight(activity);

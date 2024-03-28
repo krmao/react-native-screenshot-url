@@ -141,7 +141,7 @@ public class ScreenShotListenManager {
             try {
                 mContext.getContentResolver().unregisterContentObserver(mInternalObserver);
             } catch (Exception e) {
-                e.printStackTrace();
+                // e.printStackTrace();
             }
             mInternalObserver = null;
         }
@@ -149,7 +149,7 @@ public class ScreenShotListenManager {
             try {
                 mContext.getContentResolver().unregisterContentObserver(mExternalObserver);
             } catch (Exception e) {
-                e.printStackTrace();
+                // e.printStackTrace();
             }
             mExternalObserver = null;
         }
@@ -229,7 +229,7 @@ public class ScreenShotListenManager {
                         + "; size = " + width + " * " + height + "; date = " + dateTaken);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         } finally {
             if (cursor != null && !cursor.isClosed()) {
                 cursor.close();
@@ -332,11 +332,11 @@ public class ScreenShotListenManager {
                     );
                 } catch (Exception e) {
                     screenSize.set(defaultDisplay.getWidth(), defaultDisplay.getHeight());
-                    e.printStackTrace();
+                    // e.printStackTrace();
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
         return screenSize;
     }

@@ -68,20 +68,23 @@ public class ScreenShot extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void stopListener(final Promise promise) {
+        Activity currentActivity = getCurrentActivity();
+        if (currentActivity == null) {
+            promise.reject("500", "currentActivity is null");
+            return;
+        }
         try {
-            getCurrentActivity().runOnUiThread(new Runnable() {
+            currentActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if (manager != null) {
                         manager.stopListen();
                         manager = null;
                     }
-
                 }
             });
             promise.resolve("true");
         } catch (Exception ex) {
-            ex.printStackTrace();
             promise.reject("500", ex.getMessage());
         }
     }
@@ -112,7 +115,7 @@ public class ScreenShot extends ReactContextBaseJavaModule {
             map.putString("code", "200");
             promise.resolve(map);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            // ex.printStackTrace();
             promise.reject("500", ex.getMessage());
         }
 
@@ -168,8 +171,12 @@ public class ScreenShot extends ReactContextBaseJavaModule {
     }
 
     private void startListenerCapture(final Promise promise, final String[] keywords) {
+        Activity currentActivity = getCurrentActivity();
+        if (currentActivity == null) {
+            promise.reject("500", "currentActivity is null");
+            return;
+        }
         try {
-            Activity currentActivity = getCurrentActivity();
             currentActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -221,7 +228,7 @@ public class ScreenShot extends ReactContextBaseJavaModule {
                                                         return false;
                                                     }
                                                 });
-                                            }else {
+                                            } else {
                                                 Log.e("ScreenShot", "getPermissionAwareActivity is null, just return");
                                                 contentUri = null;
                                             }
@@ -242,7 +249,7 @@ public class ScreenShot extends ReactContextBaseJavaModule {
                 }
             });
         } catch (Exception ex) {
-            ex.printStackTrace();
+            // ex.printStackTrace();
             promise.reject("500", ex.getMessage());
         }
 
@@ -272,7 +279,7 @@ public class ScreenShot extends ReactContextBaseJavaModule {
                         map.putString("uri", "file://" + saveFile(outputBitmap, extension, quality));
                         map.putString("base64", bitmapToBase64(outputBitmap, extension, quality));
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        // e.printStackTrace();
                         map.putString("code", "500");
                     }
                 } else {
@@ -372,7 +379,7 @@ public class ScreenShot extends ReactContextBaseJavaModule {
                 result = Base64.encodeToString(bitmapBytes, Base64.DEFAULT);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         } finally {
             try {
                 if (baos != null) {
@@ -380,14 +387,13 @@ public class ScreenShot extends ReactContextBaseJavaModule {
                     baos.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                // e.printStackTrace();
             }
         }
         return result;
     }
 
     private PermissionAwareActivity getPermissionAwareActivity() {
-        Activity activity = getCurrentActivity();
-        return (PermissionAwareActivity) activity;
+        return (PermissionAwareActivity) getCurrentActivity();
     }
 }
