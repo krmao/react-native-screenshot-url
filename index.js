@@ -89,7 +89,7 @@ export default class ScreenShotUtil {
         screenShotEmitter && screenShotEmitter.removeAllListeners('ScreenShot')
         screenShotEmitter = Platform.OS === 'ios' ? new NativeEventEmitter(ScreenShot) : DeviceEventEmitter;
         screenShotEmitter.addListener('ScreenShot', (data) => {
-            console.log("---- startListener callBack data.uri=", (!!data? data.uri : 'null'))
+            console.log("---- startListener callBack data=", data)
             if (callBack) {
                 callBack(data)
             }

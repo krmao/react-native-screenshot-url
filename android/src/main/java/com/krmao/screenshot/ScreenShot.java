@@ -62,7 +62,7 @@ public class ScreenShot extends ReactContextBaseJavaModule {
     @ReactMethod
     public void startListener(String keywords, Promise promise) {
         String[] keys = null;
-        if (keywords != null && keywords.length() > 0) {
+        if (keywords != null && !keywords.isEmpty()) {
             keys = keywords.split(",");
         }
         this.startListenerCapture(promise, keys);
@@ -170,7 +170,7 @@ public class ScreenShot extends ReactContextBaseJavaModule {
      * @param newContentUri
      */
     private void doWrapCallback(String code, Uri newContentUri) {
-        if(code == "200") {
+        if("200".equals(code)) {
             Log.d("ScreenShot", "doWrapCallback handleMediaContentChange newContentUri=" + (newContentUri == null ? "null" : newContentUri.toString()));
             if (manager != null) {
                 manager.handleMediaContentChange(newContentUri, new ScreenShotListenManager.OnScreenShotFinalListener() {
@@ -214,9 +214,6 @@ public class ScreenShot extends ReactContextBaseJavaModule {
                             new ScreenShotListenManager.OnScreenShotListen() {
                                 public void onShot(Uri newContentUri) {
                                     Log.d("ScreenShot", "setListener onShot newContentUri=" + newContentUri.toString());
-                                    if(currentActivity == null || currentActivity.isFinishing()){
-                                        return;
-                                    }
                                     if (SDK_INT > 22) {
                                         String[] PERMISSIONS;
                                         if (SDK_INT > 32) {
@@ -234,14 +231,11 @@ public class ScreenShot extends ReactContextBaseJavaModule {
                                             PermissionAwareActivity activity = getPermissionAwareActivity();
                                             if (activity != null) {
                                                 int originRequestCode = 999;
-                                                doWrapCallbackBeforeRequestPermission();
 
+                                                doWrapCallbackBeforeRequestPermission();
                                                 new Timer().schedule(new TimerTask() {
                                                     @Override
                                                     public void run() {
-                                                        if(currentActivity == null || currentActivity.isFinishing()){
-                                                            return;
-                                                        }
                                                         currentActivity.runOnUiThread(
                                                                 new Runnable() {
                                                                     @Override
@@ -253,6 +247,7 @@ public class ScreenShot extends ReactContextBaseJavaModule {
                                                                                 Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult permissions=" + Arrays.toString(permissions));
                                                                                 Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult grantResults=" + Arrays.toString(grantResults));
                                                                                 doWrapCallbackAfterRequestPermission();
+
                                                                                 boolean isAllGranted = true;
                                                                                 for (int index = 0; index < grantResults.length; index++) {
                                                                                     if (grantResults[index] != PackageManager.PERMISSION_GRANTED) {
@@ -275,7 +270,7 @@ public class ScreenShot extends ReactContextBaseJavaModule {
                                                                 }
                                                         );
                                                     }
-                                                }, 350);
+                                                }, 400);
                                             } else {
                                                 Log.e("ScreenShot", "getPermissionAwareActivity is null, just return");
                                                 contentUri = null;
