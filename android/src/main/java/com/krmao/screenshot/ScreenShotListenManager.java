@@ -16,6 +16,9 @@ import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -159,9 +162,28 @@ public class ScreenShotListenManager {
         sHasCallbackPaths.clear();
     }
 
+    @NotNull
+    private final Handler handler = new Handler(Looper.getMainLooper());
+
+    @Nullable
+    private Runnable runnable = null;
+
+    /** @noinspection Convert2Lambda*/
     private void handleMediaContentChangeWrap(Uri contentUri) {
-        if (mListener != null ) {
-            mListener.onShot(contentUri);
+        if (mListener != null) {
+            // 移除之前的回调
+            if (runnable != null) {
+                handler.removeCallbacks(runnable);
+            }
+            // 创建新的回调
+            runnable = new Runnable() {
+                @Override
+                public void run() {
+                    mListener.onShot(contentUri, handler);
+                }
+            };
+            // 延迟执行回调
+            handler.postDelayed(runnable, 220);
         }
     }
 
@@ -353,7 +375,7 @@ public class ScreenShotListenManager {
     }
 
     public interface OnScreenShotListen {
-        void onShot(Uri contentUri);
+        void onShot(Uri contentUri, @NotNull Handler handler);
     }
 
     public interface OnScreenShotFinalListener {
