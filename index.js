@@ -76,6 +76,8 @@ export default class ScreenShotUtil {
 
     /**
      * android 权限后置
+     * android 当需要申请权限时多次回调取多个750ms间隔的最后一次回调, 弹权限详情弹窗
+     * android 权限详情弹窗弹起 750ms 后谈权限弹窗
      *
      * @param callBack data: (code, uri, base64)
      *                code  "200" = both android and ios, success got image, with uri and base64
@@ -89,7 +91,7 @@ export default class ScreenShotUtil {
         screenShotEmitter && screenShotEmitter.removeAllListeners('ScreenShot')
         screenShotEmitter = Platform.OS === 'ios' ? new NativeEventEmitter(ScreenShot) : DeviceEventEmitter;
         screenShotEmitter.addListener('ScreenShot', (data) => {
-            console.log("---- startListener callBack data=", data)
+            console.log("---- startListener callBack data.code=", data.code, data.uri)
             if (callBack) {
                 callBack(data)
             }

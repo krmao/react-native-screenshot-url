@@ -16,9 +16,6 @@ import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -92,9 +89,9 @@ public class ScreenShotListenManager {
         if (sScreenRealSize == null) {
             sScreenRealSize = getRealScreenSize();
             if (sScreenRealSize != null) {
-                Log.w("ScreenShot","Screen Real Size: " + sScreenRealSize.x + " * " + sScreenRealSize.y);
+                Log.w("ScreenShot", "Screen Real Size: " + sScreenRealSize.x + " * " + sScreenRealSize.y);
             } else {
-                Log.w("ScreenShot","Get screen real size failed.");
+                Log.w("ScreenShot", "Get screen real size failed.");
             }
         }
         mFileKeyWords = fileKeyWords;
@@ -162,28 +159,9 @@ public class ScreenShotListenManager {
         sHasCallbackPaths.clear();
     }
 
-    @NotNull
-    private final Handler handler = new Handler(Looper.getMainLooper());
-
-    @Nullable
-    private Runnable runnable = null;
-
-    /** @noinspection Convert2Lambda*/
     private void handleMediaContentChangeWrap(Uri contentUri) {
         if (mListener != null) {
-            // 移除之前的回调
-            if (runnable != null) {
-                handler.removeCallbacks(runnable);
-            }
-            // 创建新的回调
-            runnable = new Runnable() {
-                @Override
-                public void run() {
-                    mListener.onShot(contentUri, handler);
-                }
-            };
-            // 延迟执行回调
-            handler.postDelayed(runnable, 220);
+            mListener.onShot(contentUri);
         }
     }
 
@@ -193,7 +171,7 @@ public class ScreenShotListenManager {
     @SuppressLint("ObsoleteSdkInt")
     public void handleMediaContentChange(Uri contentUri, OnScreenShotFinalListener listener) {
         if (contentUri == null || listener == null) {
-            Log.w("ScreenShot","contentUri or listener is null");
+            Log.w("ScreenShot", "contentUri or listener is null");
             return;
         }
         Cursor cursor = null;
@@ -209,11 +187,11 @@ public class ScreenShotListenManager {
             );
 
             if (cursor == null) {
-                Log.w("ScreenShot","Deviant logic.");
+                Log.w("ScreenShot", "Deviant logic.");
                 return;
             }
             if (!cursor.moveToFirst()) {
-                Log.w("ScreenShot","Cursor no data.");
+                Log.w("ScreenShot", "Cursor no data.");
                 return;
             }
 
@@ -244,14 +222,14 @@ public class ScreenShotListenManager {
 
             // 处理获取到的第一行数据
             if (checkScreenShot(data, dateTaken, width, height)) {
-                Log.w("ScreenShot","ScreenShot: path = " + data + "; size = " + width + " * " + height
+                Log.w("ScreenShot", "ScreenShot: path = " + data + "; size = " + width + " * " + height
                         + "; date = " + dateTaken);
                 if (listener != null && !checkCallback(data)) {
                     listener.onShot(data);
                 }
             } else {
                 // 如果在观察区间媒体数据库有数据改变，又不符合截屏规则，则输出到 log 待分析
-                Log.w("ScreenShot","Media content changed, but not screenshot: path = " + data
+                Log.w("ScreenShot", "Media content changed, but not screenshot: path = " + data
                         + "; size = " + width + " * " + height + "; date = " + dateTaken);
             }
         } catch (Exception e) {
@@ -375,7 +353,7 @@ public class ScreenShotListenManager {
     }
 
     public interface OnScreenShotListen {
-        void onShot(Uri contentUri, @NotNull Handler handler);
+        void onShot(Uri contentUri);
     }
 
     public interface OnScreenShotFinalListener {

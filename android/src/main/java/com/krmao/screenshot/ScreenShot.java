@@ -41,8 +41,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
 
 @SuppressWarnings({"ConstantConditions", "unused", "JavadocDeclaration", "ResultOfMethodCallIgnored", "ForLoopReplaceableByForEach", "Convert2Lambda", "Anonymous2MethodRef"})
 public class ScreenShot extends ReactContextBaseJavaModule {
@@ -51,6 +49,9 @@ public class ScreenShot extends ReactContextBaseJavaModule {
     private ScreenShotListenManager manager;
     private final static String path = "/screenshot/";
     private Uri contentUri;
+
+    @NotNull
+    private final Handler handler = new Handler(Looper.getMainLooper());
 
     public ScreenShot(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -141,18 +142,29 @@ public class ScreenShot extends ReactContextBaseJavaModule {
         }
     }
 
-    private boolean hasPermissions(Activity activity, String[] permissions) {
-        if (permissions != null) {
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
-                    Log.d("PERMISSIONS", "Permission is not granted: " + permission);
-                    return false;
-                }
-                Log.d("PERMISSIONS", "Permission already granted: " + permission);
+    @NonNull
+    public static String[] getPermission() {
+        String[] permissions = new String[]{};
+        if (SDK_INT > 22) {
+            if (SDK_INT > 32) {
+                permissions = new String[]{Manifest.permission.READ_MEDIA_IMAGES};
+            } else {
+                permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
             }
-            return true;
         }
-        return false;
+        return permissions;
+    }
+
+    public static boolean hasPermissions(Activity activity) {
+        String[] permissions = getPermission();
+        for (String permission : permissions) {
+            if (ActivityCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
+                Log.d("PERMISSIONS", "Permission is not granted: " + permission);
+                return false;
+            }
+            Log.d("PERMISSIONS", "Permission already granted: " + permission);
+        }
+        return true;
     }
 
     private void doWrapCallbackWithSuccess(Uri newContentUri) {
@@ -168,13 +180,13 @@ public class ScreenShot extends ReactContextBaseJavaModule {
     }
 
     /**
-     * @param code "200" = success got image
-     *             "198" = before request permission
-     *             "199" = after request permission
+     * @param code          "200" = success got image
+     *                      "198" = before request permission
+     *                      "199" = after request permission
      * @param newContentUri
      */
     private void doWrapCallback(String code, Uri newContentUri) {
-        if("200".equals(code)) {
+        if ("200".equals(code)) {
             Log.d("ScreenShot", "doWrapCallback handleMediaContentChange newContentUri=" + (newContentUri == null ? "null" : newContentUri.toString()));
             if (manager != null) {
                 manager.handleMediaContentChange(newContentUri, new ScreenShotListenManager.OnScreenShotFinalListener() {
@@ -193,13 +205,14 @@ public class ScreenShot extends ReactContextBaseJavaModule {
             } else {
                 Log.d("ScreenShot", "doWrapCallback manager is null, ignore");
             }
-        }else{
-            // 获取到系统文件
+        } else {
             WritableMap map = Arguments.createMap();
             map.putString("code", code);
             reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("ScreenShot", map);
         }
     }
+
+    private Runnable runnable = null;
 
     private void startListenerCapture(final Promise promise, final String[] keywords) {
         Activity currentActivity = getCurrentActivity();
@@ -216,58 +229,59 @@ public class ScreenShot extends ReactContextBaseJavaModule {
                     manager = ScreenShotListenManager.newInstance(reactContext, keywords);
                     manager.setListener(
                             new ScreenShotListenManager.OnScreenShotListen() {
-                                public void onShot(Uri newContentUri, @NotNull Handler handler) {
+                                public void onShot(Uri newContentUri) {
                                     Log.d("ScreenShot", "setListener onShot newContentUri=" + newContentUri.toString());
                                     if (SDK_INT > 22) {
-                                        String[] PERMISSIONS;
-                                        if (SDK_INT > 32) {
-                                            Log.d("ScreenShot", "doWrapCallback SDK_INT > 32");
-                                            PERMISSIONS = new String[]{Manifest.permission.READ_MEDIA_IMAGES};
-                                        } else {
-                                            Log.d("ScreenShot", "doWrapCallback SDK_INT <= 32");
-                                            PERMISSIONS = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
-                                        }
-                                        Log.d("ScreenShot", "check Permissions PERMISSIONS=" + Arrays.toString(PERMISSIONS));
-
-                                        if (!hasPermissions(currentActivity, PERMISSIONS)) {
+                                        if (!hasPermissions(currentActivity)) {
                                             Log.d("ScreenShot", "hasPermissions false, launch PERMISSIONS ui");
                                             contentUri = newContentUri;
                                             PermissionAwareActivity activity = getPermissionAwareActivity();
                                             if (activity != null) {
-                                                int originRequestCode = 999;
+                                                if(runnable != null){
+                                                    handler.removeCallbacks(runnable);
+                                                }
 
-                                                doWrapCallbackBeforeRequestPermission();
-                                                handler.postDelayed(new Runnable() {
+                                                runnable = new Runnable() {
                                                     @Override
                                                     public void run() {
-                                                        activity.requestPermissions(PERMISSIONS, originRequestCode, new PermissionListener() {
-                                                            @Override
-                                                            public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-                                                                Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult requestCode=" + requestCode);
-                                                                Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult permissions=" + Arrays.toString(permissions));
-                                                                Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult grantResults=" + Arrays.toString(grantResults));
-                                                                doWrapCallbackAfterRequestPermission();
+                                                        int originRequestCode = 999;
 
-                                                                boolean isAllGranted = true;
-                                                                for (int index = 0; index < grantResults.length; index++) {
-                                                                    if (grantResults[index] != PackageManager.PERMISSION_GRANTED) {
-                                                                        isAllGranted = false;
-                                                                        break;
+                                                        doWrapCallbackBeforeRequestPermission();
+                                                        handler.postDelayed(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                activity.requestPermissions(getPermission(), originRequestCode, new PermissionListener() {
+                                                                    @Override
+                                                                    public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+                                                                        Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult requestCode=" + requestCode);
+                                                                        Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult permissions=" + Arrays.toString(permissions));
+                                                                        Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult grantResults=" + Arrays.toString(grantResults));
+                                                                        doWrapCallbackAfterRequestPermission();
+
+                                                                        boolean isAllGranted = true;
+                                                                        for (int index = 0; index < grantResults.length; index++) {
+                                                                            if (grantResults[index] != PackageManager.PERMISSION_GRANTED) {
+                                                                                isAllGranted = false;
+                                                                                break;
+                                                                            }
+                                                                        }
+                                                                        if (requestCode == originRequestCode && isAllGranted) {
+                                                                            Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult all granted, doWrapCallback");
+                                                                            doWrapCallbackWithSuccess(contentUri);
+                                                                            contentUri = null;
+                                                                            return true;
+                                                                        }
+                                                                        contentUri = null;
+                                                                        Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult not all granted, return false");
+                                                                        return false;
                                                                     }
-                                                                }
-                                                                if (requestCode == originRequestCode && isAllGranted) {
-                                                                    Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult all granted, doWrapCallback");
-                                                                    doWrapCallbackWithSuccess(contentUri);
-                                                                    contentUri = null;
-                                                                    return true;
-                                                                }
-                                                                contentUri = null;
-                                                                Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult not all granted, return false");
-                                                                return false;
+                                                                });
                                                             }
-                                                        });
+                                                        }, 750);
                                                     }
-                                                }, 400);
+                                                };
+
+                                                handler.postDelayed(runnable, 750);
                                             } else {
                                                 Log.e("ScreenShot", "getPermissionAwareActivity is null, just return");
                                                 contentUri = null;
@@ -292,8 +306,6 @@ public class ScreenShot extends ReactContextBaseJavaModule {
             // ex.printStackTrace();
             promise.reject("500", ex.getMessage());
         }
-
-
     }
 
     /**

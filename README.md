@@ -12,12 +12,31 @@ yarn add react-native-screenshot-url
 ```typescript
 import ScreenShotUtil, { CallbackInfo } from 'react-native-screenshot-url';
 
+const [screenShotUri, setScreenShotUri] = useState<string | undefined>(undefined);
+
+
 useEffect(() => {
     ScreenShotUtil.startListener((res: CallbackInfo) => {
-        // android 权限请求后置 & 内置
-        // ios 无需权限
-        if(res.code === "200"){
-            console.log('- startScreenShot uri=' + res.uri);    
+        console.log('- [Start] screenShot callback res.code=', res.code);
+        if (res.code === '200') {
+            setScreenShotUri(res.uri);
+
+            //region 5s消失术
+            if (timeoutIdRef.current) {
+                clearTimeout(timeoutIdRef.current);
+            }
+            console.log('- [Start] screenShot 5s wait start');
+            timeoutIdRef.current = setTimeout(() => {
+                console.log('- [Start] screenShot 5s wait end');
+                setScreenShotUri(undefined);
+            }, 5000);
+            //endregion
+        } else if (res.code === '198') {
+            console.log('- [Start] screenShot callback 198 show permission description');
+            showDescription('AAAAA', 'BBBBBO', 'mediaPermission');
+        } else if (res.code === '199') {
+            console.log('- [Start] screenShot callback 199 hide permission description');
+            PermissionUtil.hideDescriptionWithDialogName('mediaPermission');
         }
     }, '截屏,screen');
 
