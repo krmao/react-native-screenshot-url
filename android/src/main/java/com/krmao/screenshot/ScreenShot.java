@@ -197,8 +197,8 @@ public class ScreenShot extends ReactContextBaseJavaModule {
 
     private void startListenerCapture(final Promise promise, final String[] keywords) {
         Activity currentActivity = getCurrentActivity();
-        if (currentActivity == null) {
-            promise.reject("500", "currentActivity is null");
+        if (currentActivity == null || currentActivity.isFinishing()) {
+            promise.reject("500", "currentActivity is null or finishing");
             return;
         }
         try {
@@ -212,6 +212,9 @@ public class ScreenShot extends ReactContextBaseJavaModule {
                             new ScreenShotListenManager.OnScreenShotListen() {
                                 public void onShot(Uri newContentUri) {
                                     Log.d("ScreenShot", "setListener onShot newContentUri=" + newContentUri.toString());
+                                    if(currentActivity == null || currentActivity.isFinishing()){
+                                        return;
+                                    }
                                     if (SDK_INT > 22) {
                                         String[] PERMISSIONS;
                                         if (SDK_INT > 32) {
@@ -229,32 +232,48 @@ public class ScreenShot extends ReactContextBaseJavaModule {
                                             PermissionAwareActivity activity = getPermissionAwareActivity();
                                             if (activity != null) {
                                                 int originRequestCode = 999;
-                                                doWrapCallbackBeforeRequestPermission()
-                                                activity.requestPermissions(PERMISSIONS, originRequestCode, new PermissionListener() {
+                                                doWrapCallbackBeforeRequestPermission();
+
+                                                new Timer().schedule(new TimerTask() {
                                                     @Override
-                                                    public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-                                                        Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult requestCode=" + requestCode);
-                                                        Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult permissions=" + Arrays.toString(permissions));
-                                                        Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult grantResults=" + Arrays.toString(grantResults));
-                                                        doWrapCallbackAfterRequestPermission();
-                                                        boolean isAllGranted = true;
-                                                        for (int index = 0; index < grantResults.length; index++) {
-                                                            if (grantResults[index] != PackageManager.PERMISSION_GRANTED) {
-                                                                isAllGranted = false;
-                                                                break;
-                                                            }
+                                                    public void run() {
+                                                        if(currentActivity == null || currentActivity.isFinishing()){
+                                                            return;
                                                         }
-                                                        if (requestCode == originRequestCode && isAllGranted) {
-                                                            Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult all granted, doWrapCallback");
-                                                            doWrapCallbackWithSuccess(contentUri);
-                                                            contentUri = null;
-                                                            return true;
-                                                        }
-                                                        contentUri = null;
-                                                        Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult not all granted, return false");
-                                                        return false;
+                                                        currentActivity.runOnUiThread(
+                                                                new Runnable() {
+                                                                    @Override
+                                                                    public void run() {
+                                                                        activity.requestPermissions(PERMISSIONS, originRequestCode, new PermissionListener() {
+                                                                            @Override
+                                                                            public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+                                                                                Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult requestCode=" + requestCode);
+                                                                                Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult permissions=" + Arrays.toString(permissions));
+                                                                                Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult grantResults=" + Arrays.toString(grantResults));
+                                                                                doWrapCallbackAfterRequestPermission();
+                                                                                boolean isAllGranted = true;
+                                                                                for (int index = 0; index < grantResults.length; index++) {
+                                                                                    if (grantResults[index] != PackageManager.PERMISSION_GRANTED) {
+                                                                                        isAllGranted = false;
+                                                                                        break;
+                                                                                    }
+                                                                                }
+                                                                                if (requestCode == originRequestCode && isAllGranted) {
+                                                                                    Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult all granted, doWrapCallback");
+                                                                                    doWrapCallbackWithSuccess(contentUri);
+                                                                                    contentUri = null;
+                                                                                    return true;
+                                                                                }
+                                                                                contentUri = null;
+                                                                                Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult not all granted, return false");
+                                                                                return false;
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                }
+                                                        );
                                                     }
-                                                });
+                                                }, 350);
                                             } else {
                                                 Log.e("ScreenShot", "getPermissionAwareActivity is null, just return");
                                                 contentUri = null;
