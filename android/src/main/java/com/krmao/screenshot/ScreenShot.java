@@ -37,6 +37,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 @SuppressWarnings({"ConstantConditions", "unused", "JavadocDeclaration", "ResultOfMethodCallIgnored", "ForLoopReplaceableByForEach", "Convert2Lambda", "Anonymous2MethodRef"})
 public class ScreenShot extends ReactContextBaseJavaModule {
