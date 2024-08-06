@@ -4,7 +4,7 @@ const {NativeModules, NativeEventEmitter, DeviceEventEmitter, Platform, Permissi
 
 let screenShotEmitter = undefined
 
-// noinspection JSVoidFunctionReturnValueUsed,JSCheckFunctionSignatures,JSUnusedGlobalSymbols,JSUnresolvedReference,JSDeprecatedSymbols,ES6RedundantAwait,JSIgnoredPromiseFromCall
+// noinspection JSVoidFunctionReturnValueUsed,JSCheckFunctionSignatures,JSUnusedGlobalSymbols,JSUnresolvedReference,JSDeprecatedSymbols,ES6RedundantAwait,JSIgnoredPromiseFromCall,JSCommentMatchesSignature
 /**
  * 获取系统截屏事件/截屏工具类
  * android 默认不包含状态时间
@@ -54,7 +54,9 @@ export default class ScreenShotUtil {
     };
 
     /**
-     * 开始监听截屏事件， keyWords android 监听数据变化，截屏文件名的关键字
+     * android 权限前置
+     *
+     * 开始监听截屏事件， keyWords android 监听数据变化 截屏文件名的关键字
      * @param {*} callBack
      * @param keyWords
      */
@@ -72,6 +74,14 @@ export default class ScreenShotUtil {
         }
     }
 
+    /**
+     * android 权限后置
+     *
+     * @param callBack data: (code, uri, base64)
+     *                code  "200" = both android and ios, success got image, with uri and base64
+     *                code  "198" = 仅 android, before request permission with nothing others
+     *                code  "199" = 仅 android, after request permission with nothing others
+     */
     static startListener(callBack, keyWords) {
         console.log("---- startListener keyWords=", keyWords)
         const ScreenShot = NativeModules.ScreenShot;

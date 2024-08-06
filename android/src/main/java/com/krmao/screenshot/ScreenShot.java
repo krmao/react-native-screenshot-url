@@ -149,24 +149,49 @@ public class ScreenShot extends ReactContextBaseJavaModule {
         return false;
     }
 
-    private void doWrapCallback(Uri newContentUri) {
-        Log.d("ScreenShot", "doWrapCallback handleMediaContentChange newContentUri=" + newContentUri.toString());
-        if (manager != null) {
-            manager.handleMediaContentChange(newContentUri, new ScreenShotListenManager.OnScreenShotFinalListener() {
-                @Override
-                public void onShot(String imagePath) {
-                    Log.d("ScreenShot", "doWrapCallback onShot imagePath=" + imagePath);
+    private void doWrapCallbackWithSuccess(Uri newContentUri) {
+        doWrapCallback("200", newContentUri);
+    }
 
-                    // 获取到系统文件
-                    WritableMap map = Arguments.createMap();
-                    map.putString("code", "200");
-                    map.putString("uri", imagePath.indexOf("file://") == 0 ? imagePath : "file://" + imagePath);
-                    map.putString("base64", bitmapToBase64(BitmapFactory.decodeFile(imagePath), "png", 100));
-                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("ScreenShot", map);
-                }
-            });
-        } else {
-            Log.d("ScreenShot", "doWrapCallback manager is null, ignore");
+    private void doWrapCallbackBeforeRequestPermission() {
+        doWrapCallback("198", null);
+    }
+
+    private void doWrapCallbackAfterRequestPermission() {
+        doWrapCallback("199", null);
+    }
+
+    /**
+     * @param code "200" = success got image
+     *             "198" = before request permission
+     *             "199" = after request permission
+     * @param newContentUri
+     */
+    private void doWrapCallback(String code, Uri newContentUri) {
+        if(code == "200") {
+            Log.d("ScreenShot", "doWrapCallback handleMediaContentChange newContentUri=" + (newContentUri == null ? "null" : newContentUri.toString()));
+            if (manager != null) {
+                manager.handleMediaContentChange(newContentUri, new ScreenShotListenManager.OnScreenShotFinalListener() {
+                    @Override
+                    public void onShot(String imagePath) {
+                        Log.d("ScreenShot", "doWrapCallback onShot imagePath=" + imagePath);
+
+                        // 获取到系统文件
+                        WritableMap map = Arguments.createMap();
+                        map.putString("code", code);
+                        map.putString("uri", imagePath.indexOf("file://") == 0 ? imagePath : "file://" + imagePath);
+                        map.putString("base64", bitmapToBase64(BitmapFactory.decodeFile(imagePath), "png", 100));
+                        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("ScreenShot", map);
+                    }
+                });
+            } else {
+                Log.d("ScreenShot", "doWrapCallback manager is null, ignore");
+            }
+        }else{
+            // 获取到系统文件
+            WritableMap map = Arguments.createMap();
+            map.putString("code", code);
+            reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("ScreenShot", map);
         }
     }
 
@@ -204,12 +229,14 @@ public class ScreenShot extends ReactContextBaseJavaModule {
                                             PermissionAwareActivity activity = getPermissionAwareActivity();
                                             if (activity != null) {
                                                 int originRequestCode = 999;
+                                                doWrapCallbackBeforeRequestPermission()
                                                 activity.requestPermissions(PERMISSIONS, originRequestCode, new PermissionListener() {
                                                     @Override
                                                     public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
                                                         Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult requestCode=" + requestCode);
                                                         Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult permissions=" + Arrays.toString(permissions));
                                                         Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult grantResults=" + Arrays.toString(grantResults));
+                                                        doWrapCallbackAfterRequestPermission();
                                                         boolean isAllGranted = true;
                                                         for (int index = 0; index < grantResults.length; index++) {
                                                             if (grantResults[index] != PackageManager.PERMISSION_GRANTED) {
@@ -219,7 +246,7 @@ public class ScreenShot extends ReactContextBaseJavaModule {
                                                         }
                                                         if (requestCode == originRequestCode && isAllGranted) {
                                                             Log.d("ScreenShot", "requestPermissions onRequestPermissionsResult all granted, doWrapCallback");
-                                                            doWrapCallback(contentUri);
+                                                            doWrapCallbackWithSuccess(contentUri);
                                                             contentUri = null;
                                                             return true;
                                                         }
@@ -234,11 +261,11 @@ public class ScreenShot extends ReactContextBaseJavaModule {
                                             }
                                         } else {
                                             Log.d("ScreenShot", "hasPermissions true");
-                                            doWrapCallback(newContentUri);
+                                            doWrapCallbackWithSuccess(newContentUri);
                                         }
                                     } else {
                                         Log.d("ScreenShot", "doWrapCallback SDK_INT <= 22");
-                                        doWrapCallback(newContentUri);
+                                        doWrapCallbackWithSuccess(newContentUri);
                                     }
                                 }
                             }

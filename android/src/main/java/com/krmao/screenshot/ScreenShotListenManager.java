@@ -170,6 +170,10 @@ public class ScreenShotListenManager {
      */
     @SuppressLint("ObsoleteSdkInt")
     public void handleMediaContentChange(Uri contentUri, OnScreenShotFinalListener listener) {
+        if (contentUri == null || listener == null) {
+            Log.w("ScreenShot","contentUri or listener is null");
+            return;
+        }
         Cursor cursor = null;
         try {
             // 数据改变时查询数据库中最后加入的一条数据
